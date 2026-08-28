@@ -8,6 +8,7 @@ interface HeroClockProps {
   onResetTimeMachine: () => void;
   freeRoomsCount: number;
   totalRoomsCount: number;
+  isLoading?: boolean;
 }
 
 export const HeroClock: React.FC<HeroClockProps> = ({
@@ -15,6 +16,7 @@ export const HeroClock: React.FC<HeroClockProps> = ({
   onResetTimeMachine,
   freeRoomsCount,
   totalRoomsCount,
+  isLoading = false,
 }) => {
   const [liveTimeMs, setLiveTimeMs] = useState<number>(() => Date.now());
 
@@ -78,7 +80,15 @@ export const HeroClock: React.FC<HeroClockProps> = ({
 
       {/* Subtitle / Status indicator */}
       <div className="mt-2 flex items-center justify-center gap-2">
-        {isSimulating ? (
+        {isLoading ? (
+          <div
+            id="running"
+            className="font-mono text-xs sm:text-sm tracking-wider uppercase text-[var(--ink-3)] flex items-center gap-2"
+          >
+            <span className="w-2 h-2 rounded-full bg-accent-linux animate-pulse" />
+            <span>HÄMTAR SALSTILLGÅNG FRÅN TIMEEDIT...</span>
+          </div>
+        ) : isSimulating ? (
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-medium bg-status-sim/15 text-status-sim border border-status-sim/30">
             <span className="w-2 h-2 rounded-full bg-status-sim shadow-[0_0_8px_var(--status-sim)] animate-pulse" />
             <span>

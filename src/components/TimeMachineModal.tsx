@@ -71,10 +71,13 @@ export const TimeMachineModal: React.FC<TimeMachineModalProps> = ({
     month: 'numeric',
   });
 
+  const [todayYear, todayMonth, todayDay] = todayStr.split('-').map(Number);
+
   for (let i = 0; i < 14; i++) {
-    const dayMs = currentTimeMs + i * 24 * 60 * 60 * 1000;
-    const dateStr = formatStockholmDate(dayMs);
-    const parts = formatter.formatToParts(new Date(dayMs));
+    // Increment calendar day at noon UTC to prevent DST boundary drift
+    const targetDate = new Date(Date.UTC(todayYear, todayMonth - 1, todayDay + i, 12, 0, 0));
+    const dateStr = formatStockholmDate(targetDate.getTime());
+    const parts = formatter.formatToParts(targetDate);
     const weekday = parts.find((p) => p.type === 'weekday')?.value || '';
     const day = parts.find((p) => p.type === 'day')?.value || '';
     const month = parts.find((p) => p.type === 'month')?.value || '';
@@ -84,7 +87,7 @@ export const TimeMachineModal: React.FC<TimeMachineModalProps> = ({
       weekdayShort: i === 0 ? 'Idag' : weekday.slice(0, 3),
       dayNum: `${day}/${month}`,
       isToday: dateStr === todayStr,
-      epochMs: dayMs,
+      epochMs: targetDate.getTime(),
     });
   }
 

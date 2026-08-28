@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { fetchTimeEditSchedule } from '@/lib/timeedit';
 
+export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
@@ -20,7 +21,6 @@ export async function GET() {
     return NextResponse.json(
       {
         error: 'Failed to fetch schedule from TimeEdit',
-        message: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     );

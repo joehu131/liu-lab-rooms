@@ -4,6 +4,13 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ALL_BUILDINGS } from '@/data/rooms';
 import { Search, X, Check, ChevronDown, Calendar } from 'lucide-react';
 
+// Authentic Windows 4-square logo
+export const WindowsIcon = ({ className = 'w-3 h-3 shrink-0' }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+    <path d="M0 2.222L6.5 1.333v6.222H0V2.222zm7.5-1.467L16 0v7.556H7.5V.755zM0 8.444h6.5v6.223L0 13.778V8.444zm7.5 0H16V16l-8.5-.756V8.444z" />
+  </svg>
+);
+
 interface FilterBarProps {
   selectedOs: 'all' | 'linux' | 'windows';
   onSelectOs: (os: 'all' | 'linux' | 'windows') => void;
@@ -56,9 +63,9 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         <div className="flex items-center gap-1 p-0.5 rounded-lg bg-[var(--panel)] border border-[var(--rule)] shrink-0">
           <button
             onClick={() => onSelectOs('all')}
-            className={`px-2.5 py-1 rounded-md text-xs font-mono transition-all min-h-[32px] touch-manipulation ${
+            className={`px-2.5 py-1 rounded-md text-xs font-mono transition-all min-h-[32px] touch-manipulation cursor-pointer ${
               selectedOs === 'all'
-                ? 'bg-[var(--ink)] text-[var(--bg-bot)] font-semibold shadow-sm'
+                ? 'bg-slate-200 text-slate-900 dark:bg-[var(--ink)] dark:text-[var(--bg-bot)] font-semibold shadow-sm'
                 : 'text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--panel-hover)]'
             }`}
           >
@@ -66,32 +73,34 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           </button>
           <button
             onClick={() => onSelectOs('linux')}
-            className={`px-2.5 py-1 rounded-md text-xs font-mono transition-all min-h-[32px] touch-manipulation ${
+            className={`px-2.5 py-1 rounded-md text-xs font-mono transition-all min-h-[32px] touch-manipulation flex items-center gap-1.5 cursor-pointer ${
               selectedOs === 'linux'
-                ? 'bg-accent-linux text-white font-semibold shadow-sm'
-                : 'text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--panel-hover)]'
-            }`}
-          >
-            🐧 Linux ({linuxCount})
-          </button>
-          <button
-            onClick={() => onSelectOs('windows')}
-            className={`px-2.5 py-1 rounded-md text-xs font-mono transition-all min-h-[32px] touch-manipulation ${
-              selectedOs === 'windows'
                 ? 'bg-accent-win text-white font-semibold shadow-sm'
                 : 'text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--panel-hover)]'
             }`}
           >
-            🪟 Windows ({windowsCount})
+            <span>🐧</span>
+            <span>Linux ({linuxCount})</span>
+          </button>
+          <button
+            onClick={() => onSelectOs('windows')}
+            className={`px-2.5 py-1 rounded-md text-xs font-mono transition-all min-h-[32px] touch-manipulation flex items-center gap-1.5 cursor-pointer ${
+              selectedOs === 'windows'
+                ? 'bg-accent-linux text-white font-semibold shadow-sm'
+                : 'text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--panel-hover)]'
+            }`}
+          >
+            <WindowsIcon className="w-3 h-3" />
+            <span>Windows ({windowsCount})</span>
           </button>
         </div>
 
         {/* Right Side: Framtida tillgång + Endast lediga + Building Dropdown + Search Box */}
         <div className="flex items-center gap-1.5 sm:gap-2 ml-auto flex-wrap sm:flex-nowrap">
-          {/* Framtida tid/dag Button (Placed right between Windows and Endast lediga) */}
+          {/* Framtida tid/dag Button */}
           <button
             onClick={onOpenTimeMachine}
-            className={`panel px-2.5 py-1 rounded-lg text-xs font-mono flex items-center gap-1.5 transition-all min-h-[32px] shrink-0 touch-manipulation ${
+            className={`panel px-2.5 py-1 rounded-lg text-xs font-mono flex items-center gap-1.5 transition-all min-h-[32px] shrink-0 touch-manipulation cursor-pointer ${
               isSimulating
                 ? 'bg-status-sim/15 border-status-sim text-status-sim font-semibold shadow-sm'
                 : 'text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--panel-hover)] border-[var(--rule)]'
@@ -104,14 +113,14 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           {/* Endast Lediga Toggle */}
           <button
             onClick={onToggleShowOnlyAvailable}
-            className={`panel px-2.5 py-1 rounded-lg text-xs font-mono flex items-center gap-1.5 transition-all min-h-[32px] shrink-0 touch-manipulation ${
+            className={`panel px-2.5 py-1 rounded-lg text-xs font-mono flex items-center gap-1.5 transition-all min-h-[32px] shrink-0 touch-manipulation cursor-pointer ${
               showOnlyAvailable
                 ? 'bg-status-free/15 border-status-free text-status-free font-medium'
                 : 'text-[var(--ink-2)] hover:text-[var(--ink)]'
             }`}
           >
             <div
-              className={`w-3.5 h-3.5 rounded flex items-center justify-center border transition-colors ${
+              className={`w-3.5 h-3.5 rounded border flex items-center justify-center transition-colors ${
                 showOnlyAvailable
                   ? 'bg-status-free border-status-free text-[var(--bg-bot)]'
                   : 'border-[var(--ink-3)]'
@@ -125,51 +134,65 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           {/* Custom Themed Building Dropdown */}
           <div className="relative shrink-0" ref={dropdownRef}>
             <button
-              type="button"
               onClick={() => setIsBuildingOpen(!isBuildingOpen)}
-              className="panel px-2.5 py-1 text-xs font-mono rounded-lg bg-[var(--panel)] border-[var(--rule)] text-[var(--ink)] hover:border-[var(--ink-3)] flex items-center gap-1.5 min-h-[32px] transition-colors"
+              className="panel px-2.5 py-1 rounded-lg text-xs font-mono text-[var(--ink)] flex items-center gap-1.5 hover:bg-[var(--panel-hover)] transition-all min-h-[32px] cursor-pointer"
             >
-              <span>{selectedBuilding === 'All' ? 'Alla byggnader' : selectedBuilding}</span>
+              <span className="truncate max-w-[110px]">
+                {selectedBuilding === 'All' ? 'Alla byggnader' : selectedBuilding}
+              </span>
               <ChevronDown
-                size={12}
+                size={13}
                 className={`text-[var(--ink-3)] transition-transform duration-150 ${
-                  isBuildingOpen ? 'rotate-180 text-[var(--ink)]' : ''
+                  isBuildingOpen ? 'rotate-180' : ''
                 }`}
               />
             </button>
 
-            {/* Dropdown Menu Popover */}
+            {/* Custom Styled Dropdown Menu */}
             {isBuildingOpen && (
-              <div className="absolute right-0 top-full mt-1.5 z-40 w-44 py-1 rounded-lg bg-[var(--panel-solid)] border border-[var(--rule)] shadow-2xl backdrop-blur-xl animate-fadeIn">
-                {ALL_BUILDINGS.map((b) => {
-                  const isSelected = selectedBuilding === b;
-                  return (
-                    <button
-                      key={b}
-                      type="button"
-                      onClick={() => {
-                        onSelectBuilding(b);
-                        setIsBuildingOpen(false);
-                      }}
-                      className={`w-full px-3 py-1.5 text-xs font-mono text-left flex items-center justify-between transition-colors ${
-                        isSelected
-                          ? 'bg-accent-linux/15 text-accent-linux font-semibold'
-                          : 'text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--panel-hover)]'
-                      }`}
-                    >
-                      <span>{b === 'All' ? 'Alla byggnader' : b}</span>
-                      {isSelected && <Check size={12} />}
-                    </button>
-                  );
-                })}
+              <div className="absolute right-0 mt-1 w-44 rounded-lg bg-[var(--panel-solid)] border border-[var(--rule)] shadow-2xl py-1 z-30 font-mono text-xs animate-fadeIn">
+                <button
+                  onClick={() => {
+                    onSelectBuilding('All');
+                    setIsBuildingOpen(false);
+                  }}
+                  className={`w-full px-3 py-1.5 text-left flex items-center justify-between hover:bg-[var(--panel-hover)] transition-colors cursor-pointer ${
+                    selectedBuilding === 'All'
+                      ? 'text-accent-linux font-semibold bg-accent-linux/10'
+                      : 'text-[var(--ink-2)]'
+                  }`}
+                >
+                  <span>Alla byggnader</span>
+                  {selectedBuilding === 'All' && <Check size={12} />}
+                </button>
+
+                <div className="my-1 border-t border-[var(--rule-faint)]" />
+
+                {ALL_BUILDINGS.filter((b) => b !== 'All').map((b) => (
+                  <button
+                    key={b}
+                    onClick={() => {
+                      onSelectBuilding(b);
+                      setIsBuildingOpen(false);
+                    }}
+                    className={`w-full px-3 py-1.5 text-left flex items-center justify-between hover:bg-[var(--panel-hover)] transition-colors cursor-pointer ${
+                      selectedBuilding === b
+                        ? 'text-accent-linux font-semibold bg-accent-linux/10'
+                        : 'text-[var(--ink-2)]'
+                    }`}
+                  >
+                    <span>{b}</span>
+                    {selectedBuilding === b && <Check size={12} />}
+                  </button>
+                ))}
               </div>
             )}
           </div>
 
-          {/* Compact Search Box */}
-          <div className="relative w-28 sm:w-36 md:w-40 shrink-0">
+          {/* Search Box */}
+          <div className="relative shrink-0 w-32 sm:w-36 md:w-44">
             <Search
-              size={12}
+              size={13}
               className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--ink-3)] pointer-events-none"
             />
             <input
@@ -177,15 +200,14 @@ export const FilterBar: React.FC<FilterBarProps> = ({
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder="Sök sal..."
-              className="w-full pl-6 pr-5 py-1 text-xs font-mono rounded-lg bg-[var(--panel)] border border-[var(--rule)] text-[var(--ink)] placeholder:text-[var(--ink-3)] focus:outline-none focus:border-accent-linux transition-colors min-h-[32px]"
+              className="panel w-full pl-7 pr-6 py-1 text-xs font-mono text-[var(--ink)] placeholder-[var(--ink-3)] focus:outline-none focus:border-accent-linux transition-colors min-h-[32px]"
             />
             {searchQuery && (
               <button
                 onClick={() => onSearchChange('')}
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[var(--ink-3)] hover:text-[var(--ink)] p-0.5"
-                aria-label="Clear search"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--ink-3)] hover:text-[var(--ink)]"
               >
-                <X size={10} />
+                <X size={12} />
               </button>
             )}
           </div>

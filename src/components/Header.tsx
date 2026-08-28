@@ -40,7 +40,6 @@ export const Header: React.FC<HeaderProps> = ({ onRefresh, isLoading, lastUpdate
       <header className="w-full max-w-5xl mx-auto px-4 pt-4 sm:pt-6 pb-2 flex items-center justify-between">
         {/* Left: Network Badge */}
         <div className="panel inline-flex items-center gap-2 px-3 py-1.5 bg-[var(--panel)] border-[var(--rule)]">
-          <span className="w-2 h-2 rounded-full bg-accent-linux shadow-[0_0_8px_var(--accent-linux)]" />
           <span className="font-mono text-xs font-semibold tracking-wider text-[var(--ink)]">
             LiU Labbsalar
           </span>

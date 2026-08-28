@@ -19,7 +19,8 @@ export interface TimeSlotInterval {
   start: number;           // Epoch ms
   end: number;             // Epoch ms
   courseCode?: string;     // e.g. "TDDD27" or "DRS Service"
-  info?: string;           // Booking info
+  activityType?: string;   // e.g. "Laboration", "Lektion", "Tentamen" (Undervisningstyp)
+  info?: string;           // Booking info / event name
 }
 
 export interface GanttSegment {
@@ -37,15 +38,18 @@ export interface RoomAvailability {
   busyUntil?: number;      // Epoch ms when current booking ends (if currently busy)
   currentBooking?: {
     courseCode?: string;
+    activityType?: string;
     info?: string;
     end: number;
   };
   nextBooking?: {
     courseCode?: string;
+    activityType?: string;
     info?: string;
     start: number;
   };
   ganttSegments: GanttSegment[];
+  todayBookings: TimeSlotInterval[];
 }
 
 export interface ScheduleResponse {

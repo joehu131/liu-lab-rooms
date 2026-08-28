@@ -131,7 +131,7 @@ test('Availability Engine & Timezone Tests', async (t) => {
     assert.equal(parsed.reservations['SU15/16'][0].courseCode, 'TDDC76');
   });
 
-  await t.test('calculateGanttSegments produces accurate 08:00 to 20:00 blocks', () => {
+  await t.test('calculateGanttSegments produces accurate 07:00 to 21:00 blocks', () => {
     const intervals: TimeSlotInterval[] = [
       {
         start: parseStockholmDateTime('2026-08-28', '08:15'),
@@ -143,9 +143,9 @@ test('Availability Engine & Timezone Tests', async (t) => {
     const segments = calculateGanttSegments(intervals, '2026-08-28');
     assert.ok(segments.length >= 3);
 
-    // Segment 1: Free 08:00 - 08:15 (8.0 to 8.25)
+    // Segment 1: Free 07:00 - 08:15 (7.0 to 8.25)
     assert.equal(segments[0].isOccupied, false);
-    assert.equal(segments[0].startHour, 8);
+    assert.equal(segments[0].startHour, 7);
     assert.equal(segments[0].endHour, 8.25);
 
     // Segment 2: Occupied 08:15 - 10:00 (8.25 to 10.0)
@@ -154,10 +154,10 @@ test('Availability Engine & Timezone Tests', async (t) => {
     assert.equal(segments[1].endHour, 10);
     assert.equal(segments[1].courseCode, 'TDDD27');
 
-    // Segment 3: Free 10:00 - 20:00 (10.0 to 20.0)
+    // Segment 3: Free 10:00 - 21:00 (10.0 to 21.0)
     assert.equal(segments[2].isOccupied, false);
     assert.equal(segments[2].startHour, 10);
-    assert.equal(segments[2].endHour, 20);
+    assert.equal(segments[2].endHour, 21);
   });
 
   await t.test('Formatters test', () => {

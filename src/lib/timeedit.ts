@@ -68,6 +68,7 @@ export function parseTimeEditResponse(raw: TimeEditRawResponse): ScheduleRespons
   const headers = raw.columnheaders || [];
   const lokalIdx = headers.indexOf('Lokal');
   const courseIdx = headers.indexOf('Kurs');
+  const undervisningstypIdx = headers.indexOf('Undervisningstyp');
   const infoIdx = headers.indexOf('Information till student');
   const statusIdx = headers.indexOf('Status');
 
@@ -96,8 +97,9 @@ export function parseTimeEditResponse(raw: TimeEditRawResponse): ScheduleRespons
       continue;
     }
 
-    const courseCode = courseIdx !== -1 ? res.columns[courseIdx]?.trim() : undefined;
-    const info = infoIdx !== -1 ? res.columns[infoIdx]?.trim() : undefined;
+    const courseCode = courseIdx !== -1 && res.columns[courseIdx]?.trim() ? res.columns[courseIdx].trim() : undefined;
+    const activityType = undervisningstypIdx !== -1 && res.columns[undervisningstypIdx]?.trim() ? res.columns[undervisningstypIdx].trim() : undefined;
+    const info = infoIdx !== -1 && res.columns[infoIdx]?.trim() ? res.columns[infoIdx].trim() : undefined;
 
     // Split rooms by comma or newline (e.g. "Asgård, Egypten" or "SU01, SU02")
     const reservedRooms = lokalRaw
@@ -111,6 +113,7 @@ export function parseTimeEditResponse(raw: TimeEditRawResponse): ScheduleRespons
           start: startMs,
           end: endMs,
           courseCode: courseCode || undefined,
+          activityType: activityType || undefined,
           info: info || undefined,
         });
       }
@@ -122,7 +125,7 @@ export function parseTimeEditResponse(raw: TimeEditRawResponse): ScheduleRespons
     const list = reservationsByRoom[roomName];
     list.sort((a, b) => a.start - b.start);
 
-    // Merge overlapping intervals if any
+    // Only merge identical events
     const merged: TimeSlotInterval[] = [];
     for (const current of list) {
       if (merged.length === 0) {
@@ -131,12 +134,13 @@ export function parseTimeEditResponse(raw: TimeEditRawResponse): ScheduleRespons
       }
 
       const prev = merged[merged.length - 1];
-      if (current.start <= prev.end) {
-        // Overlap or contiguous
+      const isSameEvent =
+        prev.courseCode === current.courseCode &&
+        prev.activityType === current.activityType &&
+        prev.info === current.info;
+
+      if (isSameEvent && current.start <= prev.end) {
         prev.end = Math.max(prev.end, current.end);
-        if (!prev.courseCode && current.courseCode) {
-          prev.courseCode = current.courseCode;
-        }
       } else {
         merged.push(current);
       }
@@ -164,6 +168,7 @@ export async function fetchTimeEditSchedule(daysAhead: number = 14): Promise<Sch
     headers: {
       'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko)',
     },
+    signal: AbortSignal.timeout(8000),
     // revalidate every 15 minutes
     next: { revalidate: 900 },
   });

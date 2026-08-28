@@ -5,24 +5,52 @@ import { GanttSegment } from '@/types';
 
 interface GanttRibbonProps {
   segments: GanttSegment[];
-  currentHour?: number; // 8.0 to 20.0
+  currentHour?: number; // 7.0 to 21.0
 }
+
+const LIU_PASSES = [
+  { label: '08:00', hour: 8.0 },
+  { label: '10:00', hour: 10.0 },
+  { label: '12:00', hour: 12.0 },
+  { label: '13:00', hour: 13.0 },
+  { label: '15:00', hour: 15.0 },
+  { label: '17:00', hour: 17.0 },
+  { label: '19:00', hour: 19.0 },
+];
 
 export const GanttRibbon: React.FC<GanttRibbonProps> = ({ segments, currentHour }) => {
   return (
-    <div className="w-full mt-2.5 pt-2 border-t border-[var(--rule)]">
-      <div className="flex items-center justify-between text-[10px] font-mono text-[var(--ink-3)] mb-1">
-        <span>08:00</span>
-        <span>12:00</span>
-        <span>15:00</span>
-        <span>17:00</span>
-        <span>20:00</span>
+    <div className="w-full mt-2 select-none">
+      {/* LiU Hourly Event Ticks (Exact Geometric Coordinates) */}
+      <div className="relative w-full h-3.5 text-[9px] sm:text-[10px] font-mono text-[var(--ink-3)] mb-1">
+        {LIU_PASSES.map((pass) => {
+          const leftPercent = ((pass.hour - 7) / 14) * 100;
+          return (
+            <span
+              key={pass.label}
+              style={{ left: `${leftPercent}%` }}
+              className="absolute -translate-x-1/2 whitespace-nowrap"
+            >
+              {pass.label}
+            </span>
+          );
+        })}
       </div>
 
-      {/* Progress Bar Container */}
-      <div className="relative h-2.5 w-full rounded bg-[var(--panel-hover)] border border-[var(--rule)] overflow-hidden flex">
+      {/* Progress Bar Container (07:00 to 21:00 Span) */}
+      <div className="relative h-2.5 w-full rounded bg-[var(--panel-solid)] border border-[var(--rule)] overflow-hidden flex">
+        {/* Subtle Vertical Pass Markers */}
+        {LIU_PASSES.map((pass) => (
+          <div
+            key={pass.label}
+            style={{ left: `${((pass.hour - 7) / 14) * 100}%` }}
+            className="absolute top-0 bottom-0 w-[1px] bg-[var(--rule-faint)] pointer-events-none z-0"
+          />
+        ))}
+
+        {/* Occupied / Free Segments */}
         {segments.map((seg, i) => {
-          const widthPercent = Math.max(0, ((seg.endHour - seg.startHour) / 12) * 100);
+          const widthPercent = Math.max(0, ((seg.endHour - seg.startHour) / 14) * 100);
 
           return (
             <div
@@ -30,24 +58,24 @@ export const GanttRibbon: React.FC<GanttRibbonProps> = ({ segments, currentHour 
               style={{ width: `${widthPercent}%` }}
               title={
                 seg.isOccupied
-                  ? `Booked (${seg.courseCode || 'Busy'})`
-                  : 'Available'
+                  ? `Bokat (${seg.courseCode || 'Upptagen'})`
+                  : 'Ledigt'
               }
-              className={`h-full transition-colors ${
+              className={`h-full relative z-0 transition-colors ${
                 seg.isOccupied
-                  ? 'bg-status-busy/70 border-r border-background/40'
-                  : 'bg-status-free/30 hover:bg-status-free/50'
+                  ? 'bg-status-busy'
+                  : 'bg-transparent'
               }`}
             />
           );
         })}
 
-        {/* Current Time Needle */}
-        {currentHour !== undefined && currentHour >= 8 && currentHour <= 20 && (
+        {/* Real-time / Simulated Time Needle */}
+        {currentHour !== undefined && currentHour >= 7 && currentHour <= 21 && (
           <div
-            style={{ left: `${((currentHour - 8) / 12) * 100}%` }}
-            className="absolute top-0 bottom-0 w-0.5 bg-white shadow-[0_0_6px_rgba(255,255,255,0.9)] z-10 -translate-x-1/2"
-            title={`Current: ${Math.floor(currentHour)}:${String(Math.floor((currentHour % 1) * 60)).padStart(2, '0')}`}
+            style={{ left: `${((currentHour - 7) / 14) * 100}%` }}
+            className="absolute top-0 bottom-0 w-0.5 bg-white shadow-[0_0_6px_rgba(255,255,255,0.9)] z-10 -translate-x-1/2 pointer-events-none"
+            title={`Tid: ${Math.floor(currentHour)}:${String(Math.floor((currentHour % 1) * 60)).padStart(2, '0')}`}
           />
         )}
       </div>

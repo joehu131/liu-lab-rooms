@@ -13,9 +13,10 @@
   --ink-2: #a7b3c4;
   --ink-3: #78859a;
   --rule: rgba(45, 58, 72, 0.7);
+  --rule-faint: rgba(255, 255, 255, 0.08);
   --panel: rgba(13, 20, 30, 0.95);
   --panel-solid: #0e1622;
-  --panel-hover: rgba(255, 255, 255, 0.06);
+  --panel-hover: rgba(255, 255, 255, 0.04);
 
   /* Accents */
   --accent-linux: #5aa9ff;
@@ -28,15 +29,16 @@
 
 [data-theme="light"] {
   /* Light Theme */
-  --bg-bot: #edf2f8;
-  --bg-top: #e2eaf3;
-  --ink: #121b27;
-  --ink-2: #38485e;
-  --ink-3: #637791;
-  --rule: rgba(190, 205, 222, 0.85);
-  --panel: rgba(255, 255, 255, 0.96);
+  --bg-bot: #f9fbfe;
+  --bg-top: #ffffff;
+  --ink: #0f172a;
+  --ink-2: #334155;
+  --ink-3: #64748b;
+  --rule: rgba(226, 232, 240, 0.9);
+  --rule-faint: rgba(0, 0, 0, 0.06);
+  --panel: rgba(255, 255, 255, 0.98);
   --panel-solid: #ffffff;
-  --panel-hover: rgba(0, 0, 0, 0.04);
+  --panel-hover: rgba(0, 0, 0, 0.025);
 
   /* Accents */
   --accent-linux: #0066d6;
@@ -64,15 +66,15 @@ body {
   padding-bottom: env(safe-area-inset-bottom, 16px);
 }
 
-/* Fast flat panel (No heavy backdrop blur on list elements) */
+/* Fast flat panel */
 .panel {
   background: var(--panel-solid);
   border: 1px solid var(--rule);
-  border-radius: 10px;
+  border-radius: 8px;
   transition: border-color 0.12s ease, background-color 0.12s ease;
 }
 
-/* Glassmorphism panel (Used only for top fixed header and modal overlays) */
+/* Glassmorphism panel (Used only for floating header and modal overlays) */
 .panel-glass {
   background: var(--panel);
   border: 1px solid var(--rule);
@@ -82,20 +84,19 @@ body {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
 }
 
-/* Optimized high-performance list rows with CSS containment */
-.room-row {
-  background: var(--panel-solid);
-  border: 1px solid var(--rule);
-  border-radius: 8px;
-  contain: content;
-  content-visibility: auto;
-  contain-intrinsic-size: 0 36px;
-  transition: border-color 0.12s ease, background-color 0.12s ease;
+/* Super faint divider list container */
+.room-divider-list {
+  border-top: 1px solid var(--rule-faint);
+  border-bottom: 1px solid var(--rule-faint);
 }
 
-.room-row:hover {
-  background: var(--panel-hover);
-  border-color: var(--ink-3);
+.room-divider-list > * + * {
+  border-top: 1px solid var(--rule-faint);
+}
+
+/* Optimized list rows */
+.room-row {
+  position: relative;
 }
 
 /* Custom scrollbars */

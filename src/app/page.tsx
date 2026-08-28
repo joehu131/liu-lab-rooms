@@ -56,6 +56,21 @@ export default function HomePage() {
     return calculateAllRoomsAvailability(schedule || null, activeEvalTimeMs);
   }, [schedule, activeEvalTimeMs]);
 
+  // Current fractional hour in Sweden time for Gantt needles
+  const currentHour = useMemo(() => {
+    const d = new Date(activeEvalTimeMs);
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Europe/Stockholm',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: false,
+    });
+    const parts = formatter.formatToParts(d);
+    const h = Number(parts.find((p) => p.type === 'hour')?.value || 12) % 24;
+    const m = Number(parts.find((p) => p.type === 'minute')?.value || 0);
+    return h + m / 60;
+  }, [activeEvalTimeMs]);
+
   // Filter and sort rooms
   const filteredAndSortedRooms = useMemo(() => {
     let result = [...allAvailabilities];
@@ -162,6 +177,7 @@ export default function HomePage() {
           onResetTimeMachine={() => setSimulatedTimeMs(null)}
           freeRoomsCount={freeCount}
           totalRoomsCount={allAvailabilities.length}
+          isLoading={isLoading && !schedule}
         />
 
         {/* Loading / Error States */}
@@ -204,6 +220,7 @@ export default function HomePage() {
         {schedule && (
           <RoomList
             availabilities={filteredAndSortedRooms}
+            currentHour={currentHour}
             onResetFilters={handleResetFilters}
           />
         )}
