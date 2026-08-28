@@ -1,0 +1,124 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+:root {
+  --font-ibm-plex-sans: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-ibm-plex-mono: var(--font-mono), monospace;
+
+  /* Dark Theme (Default) */
+  --bg-bot: #0a1018;
+  --bg-top: #05080e;
+  --ink: #e9eff7;
+  --ink-2: #a7b3c4;
+  --ink-3: #78859a;
+  --rule: rgba(45, 58, 72, 0.7);
+  --panel: rgba(13, 20, 30, 0.95);
+  --panel-solid: #0e1622;
+  --panel-hover: rgba(255, 255, 255, 0.06);
+
+  /* Accents */
+  --accent-linux: #5aa9ff;
+  --accent-win: #35d69a;
+  --status-free: #35d69a;
+  --status-warn: #ffd93d;
+  --status-busy: #ff7a45;
+  --status-sim: #ffd93d;
+}
+
+[data-theme="light"] {
+  /* Light Theme */
+  --bg-bot: #edf2f8;
+  --bg-top: #e2eaf3;
+  --ink: #121b27;
+  --ink-2: #38485e;
+  --ink-3: #637791;
+  --rule: rgba(190, 205, 222, 0.85);
+  --panel: rgba(255, 255, 255, 0.96);
+  --panel-solid: #ffffff;
+  --panel-hover: rgba(0, 0, 0, 0.04);
+
+  /* Accents */
+  --accent-linux: #0066d6;
+  --accent-win: #028e5a;
+  --status-free: #028e5a;
+  --status-warn: #b87b00;
+  --status-busy: #d84500;
+  --status-sim: #b87b00;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg-bot);
+  background-image: radial-gradient(circle at 50% 0%, var(--bg-top) 0%, var(--bg-bot) 75%);
+  color: var(--ink);
+  font-family: var(--font-ibm-plex-sans);
+  font-weight: 300;
+  min-height: 100vh;
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  padding-bottom: env(safe-area-inset-bottom, 16px);
+}
+
+/* Fast flat panel (No heavy backdrop blur on list elements) */
+.panel {
+  background: var(--panel-solid);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  transition: border-color 0.12s ease, background-color 0.12s ease;
+}
+
+/* Glassmorphism panel (Used only for top fixed header and modal overlays) */
+.panel-glass {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+/* Optimized high-performance list rows with CSS containment */
+.room-row {
+  background: var(--panel-solid);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  contain: content;
+  content-visibility: auto;
+  contain-intrinsic-size: 0 36px;
+  transition: border-color 0.12s ease, background-color 0.12s ease;
+}
+
+.room-row:hover {
+  background: var(--panel-hover);
+  border-color: var(--ink-3);
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--rule);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-3);
+}
+
+/* Hide scrollbar for clean horizontal list scrolling on mobile */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
