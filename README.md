@@ -64,7 +64,7 @@ npm run build
 ## iOS Widget (Scriptable)
 
 <p align="center">
-  <img src="resources/screenshots/widget.jpg" alt="LiU Lab Rooms iOS Widget" width="220" style="max-width: 100%; height: auto;" />
+  <img src="resources/screenshots/widget.png" alt="LiU Lab Rooms iOS Widget" width="220" style="max-width: 100%; height: auto;" />
 </p>
 
 1. Install [Scriptable](https://scriptable.app) on iOS.
