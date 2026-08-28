@@ -14,6 +14,7 @@ A fast, mobile-friendly web app showing real-time computer lab availability at L
 - **Filters & Search**: Filter by OS (Linux/Windows), building (B-huset, A-huset...), or free-only.
 - **Zero Maintenance**: Queries TimeEdit's persistent JSON endpoint directly with edge caching.
 - **Persistent Settings**: User preferences persist across browser sessions.
+- **iOS Widget**: Scriptable widget displaying live color-coded room status.
 
 ## Architecture
 
@@ -59,6 +60,22 @@ npm test
 # Build for production
 npm run build
 ```
+
+## iOS Widget (Scriptable)
+
+<p align="center">
+  <img src="resources/screenshots/widget.jpg" alt="LiU Lab Rooms iOS Widget" width="220" style="max-width: 100%; height: auto;" />
+</p>
+
+1. Install [Scriptable](https://scriptable.app) on iOS.
+2. Copy [`scripts/liu-lab-widget.js`](scripts/liu-lab-widget.js) into a new script in Scriptable.
+3. Add a Scriptable widget to your Home Screen and select the script.
+
+Symbols and colors:
+- W = Windows Lab room, L = Linux Lab room
+- Green = Free (for > 3 hours)
+- Yellow = Free for x min (for < 3 hours)
+- Red = Booked
 
 ## License
 
