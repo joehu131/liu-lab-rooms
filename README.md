@@ -2,14 +2,16 @@
 
 A fast, mobile-friendly web app showing real-time computer lab availability at Linköping University Campus Valla.
 
-Built for LiU students looking for free Linux or Windows lab rooms between classes
+<p align="center">
+  <img src="resources/screenshots/webapp.png" alt="LiU Lab Rooms Web App" width="650" style="max-width: 100%; height: auto;" />
+</p>
 
 ## Features
 
 - **Live Availability**: Displays whether each of the 42 computer labs on Campus Valla is free, ending soon, or occupied.
-- **Framtida Salstillgång**: Pick any day and time over the next 14 days to see upcoming room schedules before heading to campus.
+- **Framtida Salstillgång**: Pick any day and time over the next 14 days to see upcoming room schedules.
 - **Campus Navigation**: Direct links to Mazemap indoor navigation for every lab.
-- **Filters & Search**: Filter by OS (Linux/Windows), building (B-huset, A-huset, E-huset, Key, Fysikhuset, Studenthuset), or free-only.
+- **Filters & Search**: Filter by OS (Linux/Windows), building (B-huset, A-huset...), or free-only.
 - **Zero Maintenance**: Queries TimeEdit's persistent JSON endpoint directly with edge caching. 
 
 ## Labs Included (42 Total)
