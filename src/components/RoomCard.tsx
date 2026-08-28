@@ -72,10 +72,20 @@ const RoomCardComponent: React.FC<RoomCardProps> = ({
 
   return (
     <div className="room-row flex flex-col">
-      {/* Main Single-Line Row (Only this top row lights up on hover) */}
+      {/* Main Single-Line Row (Accessible keyboard button & hover state) */}
       <div
+        role="button"
+        tabIndex={0}
+        aria-expanded={isExpanded}
+        aria-controls={`room-schedule-${room.id}`}
         onClick={() => setIsExpanded((prev) => !prev)}
-        className="px-2 sm:px-3 py-1.5 flex flex-row items-center justify-between gap-1.5 sm:gap-2 w-full cursor-pointer select-none hover:bg-[var(--panel-hover)] transition-colors"
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setIsExpanded((prev) => !prev);
+          }
+        }}
+        className="px-2 sm:px-3 py-1.5 flex flex-row items-center justify-between gap-1.5 sm:gap-2 w-full cursor-pointer select-none hover:bg-[var(--panel-hover)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-linux"
       >
         {/* Left: Room Name + OS + Location/Computers (Auto-truncates with ...) */}
         <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1 overflow-hidden">
@@ -146,7 +156,10 @@ const RoomCardComponent: React.FC<RoomCardProps> = ({
 
       {/* Expanded Accordion Drawer (Schedule & Room Specs) */}
       {isExpanded && (
-        <div className="px-3 py-2.5 bg-transparent border-t border-[var(--rule-faint)] space-y-2.5 animate-fadeIn text-xs font-mono">
+        <div
+          id={`room-schedule-${room.id}`}
+          className="px-3 py-2.5 bg-transparent border-t border-[var(--rule-faint)] space-y-2.5 animate-fadeIn text-xs font-mono"
+        >
           {/* Top Specs & Mazemap Row */}
           <div className="flex flex-wrap items-center justify-between gap-2 pb-1.5 border-b border-[var(--rule-faint)]">
             <div className="flex items-center gap-3 sm:gap-4 flex-wrap text-[11px] text-[var(--ink-2)]">
@@ -263,15 +276,4 @@ const RoomCardComponent: React.FC<RoomCardProps> = ({
   );
 };
 
-export const RoomCard = memo(RoomCardComponent, (prev, next) => {
-  return (
-    prev.lang === next.lang &&
-    prev.currentHour === next.currentHour &&
-    prev.availability.status === next.availability.status &&
-    prev.availability.freeUntil === next.availability.freeUntil &&
-    prev.availability.busyUntil === next.availability.busyUntil &&
-    prev.availability.freeMinutesRemaining === next.availability.freeMinutesRemaining &&
-    prev.availability.room.id === next.availability.room.id &&
-    prev.availability.todayBookings.length === next.availability.todayBookings.length
-  );
-});
+export const RoomCard = memo(RoomCardComponent);

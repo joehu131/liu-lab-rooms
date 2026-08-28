@@ -49,6 +49,17 @@ export const TimeMachineModal: React.FC<TimeMachineModalProps> = ({
   const [selectedDateStr, setSelectedDateStr] = useState<string>(initialDateStr);
   const [selectedTimeStr, setSelectedTimeStr] = useState<string>(initialTimeStr);
 
+  // Close modal on Escape key
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
+  // Sync state when modal opens
   useEffect(() => {
     if (isOpen) {
       const activeMs = simulatedTimeMs ?? currentTimeMs;
@@ -59,64 +70,46 @@ export const TimeMachineModal: React.FC<TimeMachineModalProps> = ({
 
   if (!isOpen) return null;
 
-  const isSelectedDateToday = selectedDateStr === todayStr;
-
-  // Generate the rolling 14 days options (7x2 grid)
-  const dayOptions: Array<{
-    dateStr: string;
-    weekdayShort: string;
-    dayNum: string;
-    isToday: boolean;
-    epochMs: number;
-  }> = [];
-
-  const locale = isEn ? 'en-US' : 'sv-SE';
-  const formatter = new Intl.DateTimeFormat(locale, {
-    timeZone: 'Europe/Stockholm',
-    weekday: 'short',
-    day: 'numeric',
-    month: 'numeric',
-  });
-
-  const [todayYear, todayMonth, todayDay] = todayStr.split('-').map(Number);
+  // Generate 14-day calendar window (DST safe calendar day arithmetic)
+  const fourteenDays: { dateStr: string; weekday: string; shortDate: string; isToday: boolean; isTomorrow: boolean }[] = [];
+  const [baseY, baseM, baseD] = todayStr.split('-').map(Number);
 
   for (let i = 0; i < 14; i++) {
-    // Increment calendar day at noon UTC to prevent DST boundary drift
-    const targetDate = new Date(Date.UTC(todayYear, todayMonth - 1, todayDay + i, 12, 0, 0));
-    const dateStr = formatStockholmDate(targetDate.getTime());
-    const parts = formatter.formatToParts(targetDate);
-    const weekday = parts.find((p) => p.type === 'weekday')?.value || '';
-    const day = parts.find((p) => p.type === 'day')?.value || '';
-    const month = parts.find((p) => p.type === 'month')?.value || '';
+    const calendarUtc = new Date(Date.UTC(baseY, baseM - 1, baseD + i, 12, 0, 0));
+    const dateStr = formatStockholmDate(calendarUtc.getTime());
 
-    dayOptions.push({
+    const formatter = new Intl.DateTimeFormat(isEn ? 'en-US' : 'sv-SE', {
+      timeZone: 'Europe/Stockholm',
+      weekday: 'short',
+      day: 'numeric',
+      month: 'numeric',
+    });
+    const parts = formatter.formatToParts(calendarUtc);
+    const weekday = parts.find((p) => p.type === 'weekday')?.value?.slice(0, 3).toUpperCase() || '';
+    const dayVal = parts.find((p) => p.type === 'day')?.value || '';
+    const monthVal = parts.find((p) => p.type === 'month')?.value || '';
+
+    fourteenDays.push({
       dateStr,
-      weekdayShort: i === 0 ? t.today : weekday.slice(0, 3),
-      dayNum: `${day}/${month}`,
-      isToday: dateStr === todayStr,
-      epochMs: targetDate.getTime(),
+      weekday,
+      shortDate: `${dayVal}/${monthVal}`,
+      isToday: i === 0,
+      isTomorrow: i === 1,
     });
   }
 
-  // Find label for current selected day
-  const selectedDayOption = dayOptions.find((d) => d.dateStr === selectedDateStr);
-  const selectedDayLabel = selectedDayOption
-    ? selectedDayOption.isToday
-      ? t.today
-      : `${selectedDayOption.weekdayShort} ${selectedDayOption.dayNum}`
-    : t.today;
-
-  // Convert time "HH:MM" to minute index for range slider (0 to 1439)
-  const [h, m] = selectedTimeStr.split(':').map(Number);
-  const currentSliderMinutes = (isNaN(h) ? 12 : h) * 60 + (isNaN(m) ? 0 : m);
+  // Time Slider logic (07:00 to 21:00 = 420 to 1260 minutes)
+  const [selH, selM] = selectedTimeStr.split(':').map(Number);
+  const selectedTotalMinutes = (isNaN(selH) ? 8 : selH) * 60 + (isNaN(selM) ? 15 : selM);
 
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const mins = parseInt(e.target.value, 10);
-    const hour = Math.floor(mins / 60);
-    const minute = mins % 60;
-    const timeStr = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
-    setSelectedTimeStr(timeStr);
+    const totalMinutes = Number(e.target.value);
+    const h = Math.floor(totalMinutes / 60);
+    const m = totalMinutes % 60;
+    setSelectedTimeStr(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
   };
+
+  const isTodaySelected = selectedDateStr === todayStr;
 
   const handleApply = () => {
     const targetEpochMs = parseStockholmDateTime(selectedDateStr, selectedTimeStr);
@@ -130,16 +123,22 @@ export const TimeMachineModal: React.FC<TimeMachineModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="time-machine-title"
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn"
+    >
       <div
-        className="panel-glass max-w-lg w-full p-5 sm:p-6 text-[var(--ink)] border-[var(--rule)] relative max-h-[92vh] overflow-y-auto"
+        className="panel-glass max-w-lg w-full p-5 sm:p-6 text-[var(--ink)] border-[var(--rule)] relative max-h-[92vh] overflow-y-auto cursor-default"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
         <div className="flex items-center justify-between pb-3 mb-4 border-b border-[var(--rule)]">
           <div className="flex items-center gap-2">
             <Calendar size={18} className="text-status-sim" />
-            <h2 className="font-mono text-sm font-semibold tracking-wider uppercase text-[var(--ink)]">
+            <h2 id="time-machine-title" className="font-mono text-sm font-semibold tracking-wider uppercase text-[var(--ink)]">
               {t.timeMachineTitle}
             </h2>
           </div>
@@ -152,64 +151,68 @@ export const TimeMachineModal: React.FC<TimeMachineModalProps> = ({
           </button>
         </div>
 
-        <p className="text-xs text-[var(--ink-3)] mb-4">
+        <p className="text-xs text-[var(--ink-3)] mb-4 font-mono">
           {t.timeMachineSub}
         </p>
 
         {/* Section 1: Choose Day (14 Days grid) */}
         <div className="mb-5">
-          <label className="block text-xs font-mono font-medium text-[var(--ink-2)] mb-2">
-            {t.selectDay}:
-          </label>
-          <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
-            {dayOptions.map((opt) => {
-              const isSelected = opt.dateStr === selectedDateStr;
+          <div className="text-xs font-semibold text-[var(--ink)] mb-2 font-mono flex items-center justify-between">
+            <span>1. {t.selectDay}</span>
+            <span className="text-[var(--ink-3)] font-normal">
+              {selectedDateStr}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-7 gap-1.5 font-mono">
+            {fourteenDays.map((day) => {
+              const isSelected = day.dateStr === selectedDateStr;
               return (
                 <button
-                  key={opt.dateStr}
-                  onClick={() => setSelectedDateStr(opt.dateStr)}
-                  className={`flex flex-col items-center justify-center py-2 px-1 rounded-lg font-mono transition-all text-center cursor-pointer ${
+                  key={day.dateStr}
+                  onClick={() => setSelectedDateStr(day.dateStr)}
+                  className={`p-1.5 rounded flex flex-col items-center justify-center text-center transition-all cursor-pointer ${
                     isSelected
-                      ? 'bg-status-sim text-slate-950 font-semibold shadow-md ring-1 ring-status-sim'
-                      : opt.isToday
-                      ? 'bg-[var(--panel-hover)] text-[var(--ink)] border border-[var(--rule)]'
-                      : 'bg-[var(--panel)] text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--panel-hover)] border border-[var(--rule-faint)]'
+                      ? 'bg-status-sim text-white font-semibold shadow-md ring-1 ring-white/20'
+                      : 'panel hover:bg-[var(--panel-hover)] text-[var(--ink-2)]'
                   }`}
                 >
-                  <span className="text-[9px] uppercase tracking-tight">{opt.weekdayShort}</span>
-                  <span className="text-[11px] font-semibold mt-0.5">{opt.dayNum}</span>
+                  <span className="text-[9px] uppercase text-[var(--ink-3)]">
+                    {day.isToday ? t.today : day.isTomorrow ? t.tomorrow : day.weekday}
+                  </span>
+                  <span className="text-xs font-semibold mt-0.5">
+                    {day.shortDate}
+                  </span>
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* Section 2: LiU Standard Lecture Pass Quick Buttons */}
+        {/* Section 2: LiU Lecture Passes Presets */}
         <div className="mb-5">
-          <label className="block text-xs font-mono font-medium text-[var(--ink-2)] mb-2">
-            {t.lecturePasses}:
-          </label>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 font-mono">
+          <div className="text-xs font-semibold text-[var(--ink)] mb-2 font-mono flex items-center justify-between">
+            <span>2. {t.lecturePasses}</span>
+            <span className="text-[var(--ink-3)] font-normal text-[11px]">
+              {selectedTimeStr}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 font-mono text-xs">
             {LIU_PASS_PRESETS.map((pass) => {
               const isSelected = selectedTimeStr === pass.time;
-              const [passH, passM] = pass.time.split(':').map(Number);
-              const passTotalMinutes = passH * 60 + passM;
-              const isPastToday = isSelectedDateToday && passTotalMinutes < currentTotalMinutes;
-
               return (
                 <button
                   key={pass.time}
                   onClick={() => setSelectedTimeStr(pass.time)}
-                  className={`px-2.5 py-2 rounded-lg text-xs flex items-center justify-between transition-all cursor-pointer ${
+                  className={`p-2 rounded text-left transition-all cursor-pointer ${
                     isSelected
-                      ? 'bg-accent-linux text-white font-semibold shadow-sm'
-                      : isPastToday
-                      ? 'bg-[var(--panel)] text-[var(--ink-3)] border border-[var(--rule-faint)] opacity-60'
-                      : 'bg-[var(--panel)] text-[var(--ink)] hover:bg-[var(--panel-hover)] border border-[var(--rule)]'
+                      ? 'bg-status-sim/20 border border-status-sim text-status-sim font-semibold'
+                      : 'panel hover:bg-[var(--panel-hover)] text-[var(--ink-2)]'
                   }`}
                 >
-                  <span>{pass.label}</span>
-                  {isSelected && <Check size={12} />}
+                  <div className="font-semibold text-xs text-[var(--ink)]">{pass.label}</div>
+                  <div className="text-[10px] text-[var(--ink-3)] mt-0.5">{pass.time} – {pass.endTime}</div>
                 </button>
               );
             })}
@@ -217,60 +220,68 @@ export const TimeMachineModal: React.FC<TimeMachineModalProps> = ({
         </div>
 
         {/* Section 3: Exact Time Slider */}
-        <div className="mb-6 p-3 rounded-lg bg-[var(--panel)] border border-[var(--rule)]">
-          <div className="flex items-center justify-between mb-2 font-mono">
-            <span className="text-xs text-[var(--ink-2)] flex items-center gap-1.5">
-              <Clock size={13} className="text-accent-linux" />
-              {t.exactTime}:
+        <div className="mb-6">
+          <div className="flex items-center justify-between text-xs font-semibold text-[var(--ink)] mb-2 font-mono">
+            <span className="flex items-center gap-1.5">
+              <Clock size={13} className="text-status-sim" />
+              <span>3. {t.exactTime}</span>
             </span>
-            <span className="text-sm font-semibold text-[var(--ink)] bg-[var(--panel-solid)] px-2 py-0.5 rounded border border-[var(--rule)]">
+            <span className="text-sm font-mono text-status-sim font-bold px-2 py-0.5 rounded bg-status-sim/10">
               {selectedTimeStr}
             </span>
           </div>
 
           <input
             type="range"
-            min={0}
-            max={1439}
-            step={5}
-            value={currentSliderMinutes}
+            min={420} // 07:00
+            max={1260} // 21:00
+            step={15} // 15-minute LiU quarter steps
+            value={selectedTotalMinutes}
             onChange={handleSliderChange}
-            className="w-full accent-accent-linux cursor-pointer"
+            className="w-full h-2 bg-[var(--rule)] rounded-lg appearance-none cursor-pointer accent-status-sim"
           />
 
           <div className="flex justify-between text-[10px] font-mono text-[var(--ink-3)] mt-1">
-            <span>00:00</span>
-            <span>08:00</span>
+            <span>07:00</span>
             <span>12:00</span>
             <span>17:00</span>
-            <span>23:55</span>
+            <span>21:00</span>
           </div>
         </div>
 
-        {/* Modal Actions */}
-        <div className="flex flex-col sm:flex-row items-center gap-2 pt-2 border-t border-[var(--rule)]">
-          {simulatedTimeMs !== null && (
+        {/* Action Buttons */}
+        <div className="flex items-center justify-between gap-3 pt-3 border-t border-[var(--rule)] font-mono text-xs">
+          {simulatedTimeMs !== null ? (
             <button
               onClick={handleResetToRealtime}
-              className="w-full sm:w-auto px-3 py-2 rounded-lg text-xs font-mono text-status-warn hover:bg-status-warn/10 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+              title={t.resetLiveTitle}
+              className="panel px-3 py-2 text-[var(--ink-3)] hover:text-white hover:border-white transition-colors flex items-center gap-1.5 cursor-pointer"
             >
               <RotateCcw size={13} />
-              <span>{isEn ? 'Reset to live time' : 'Återställ till realtid'}</span>
+              <span>{t.resetLive}</span>
             </button>
+          ) : (
+            <div />
           )}
 
-          <div className="flex items-center gap-2 w-full sm:w-auto sm:ml-auto">
+          <div className="flex items-center gap-2">
             <button
               onClick={onClose}
-              className="flex-1 sm:flex-none px-3.5 py-2 rounded-lg text-xs font-mono text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--panel-hover)] transition-colors cursor-pointer"
+              className="panel px-3 py-2 text-[var(--ink-2)] hover:text-[var(--ink)] transition-colors cursor-pointer"
             >
               {t.cancel}
             </button>
             <button
               onClick={handleApply}
-              className="flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-mono font-semibold bg-status-sim text-slate-950 hover:opacity-90 transition-opacity shadow cursor-pointer flex items-center justify-center gap-1.5"
+              className="px-4 py-2 rounded-lg bg-status-sim hover:bg-status-sim/90 text-white font-semibold shadow-md flex items-center gap-1.5 transition-colors cursor-pointer"
             >
-              <span>{t.simulateAction(selectedDayLabel, selectedTimeStr)}</span>
+              <Check size={14} />
+              <span>
+                {t.simulateAction(
+                  isTodaySelected ? t.today : selectedDateStr,
+                  selectedTimeStr
+                )}
+              </span>
             </button>
           </div>
         </div>

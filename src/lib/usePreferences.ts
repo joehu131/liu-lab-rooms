@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { ALL_BUILDINGS } from '@/data/rooms';
 import { Language } from './i18n';
 
 export interface UserPreferences {
@@ -21,11 +22,13 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
   showOnlyAvailable: false,
 };
 
+const VALID_BUILDINGS_SET: Set<string> = new Set(ALL_BUILDINGS.filter((b) => b !== 'All'));
+
 /**
  * Validate and sanitize parsed preferences object
  */
 export function sanitizePreferences(raw: unknown): UserPreferences {
-  if (!raw || typeof raw !== 'object') {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
     return { ...DEFAULT_PREFERENCES };
   }
 
@@ -37,9 +40,12 @@ export function sanitizePreferences(raw: unknown): UserPreferences {
     obj.selectedOs === 'linux' || obj.selectedOs === 'windows' || obj.selectedOs === 'all'
       ? obj.selectedOs
       : DEFAULT_PREFERENCES.selectedOs;
+
+  // Deduplicate and ensure only valid campus buildings are accepted
   const selectedBuildings = Array.isArray(obj.selectedBuildings)
-    ? obj.selectedBuildings.filter((b): b is string => typeof b === 'string' && b !== 'All')
+    ? Array.from(new Set(obj.selectedBuildings.filter((b): b is string => typeof b === 'string' && VALID_BUILDINGS_SET.has(b))))
     : DEFAULT_PREFERENCES.selectedBuildings;
+
   const showOnlyAvailable = typeof obj.showOnlyAvailable === 'boolean' ? obj.showOnlyAvailable : false;
 
   return {
@@ -55,7 +61,7 @@ export function usePreferences() {
   const [preferences, setPreferences] = useState<UserPreferences>(DEFAULT_PREFERENCES);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load saved preferences on client mount
+  // 1. Load saved preferences on client mount (with legacy migration support)
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -63,48 +69,67 @@ export function usePreferences() {
         const parsed = JSON.parse(saved);
         const validated = sanitizePreferences(parsed);
         setPreferences(validated);
-        document.documentElement.setAttribute('data-theme', validated.theme);
-        document.documentElement.setAttribute('lang', validated.lang);
       } else {
-        // Default standard theme is light mode for new users
-        setPreferences(DEFAULT_PREFERENCES);
-        document.documentElement.setAttribute('data-theme', 'light');
-        document.documentElement.setAttribute('lang', 'sv');
+        // Check for legacy single-item keys for seamless upgrade
+        const legacyTheme = localStorage.getItem('liu-labs-theme') as 'dark' | 'light' | null;
+        const legacyLang = localStorage.getItem('liu-labs-lang') as Language | null;
+
+        const initialTheme = legacyTheme === 'dark' || legacyTheme === 'light' ? legacyTheme : DEFAULT_PREFERENCES.theme;
+        const initialLang = legacyLang === 'sv' || legacyLang === 'en' ? legacyLang : DEFAULT_PREFERENCES.lang;
+
+        const initialPrefs: UserPreferences = {
+          ...DEFAULT_PREFERENCES,
+          theme: initialTheme,
+          lang: initialLang,
+        };
+
+        setPreferences(initialPrefs);
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(initialPrefs));
+        } catch {
+          // Ignore write error
+        }
       }
     } catch {
-      // Ignore localStorage errors
+      // Ignore localStorage read errors
     } finally {
       setIsLoaded(true);
     }
   }, []);
 
-  // Save to localStorage whenever preferences change (once loaded)
+  // 2. Synchronize DOM side-effects in a dedicated effect
+  useEffect(() => {
+    if (isLoaded) {
+      document.documentElement.setAttribute('data-theme', preferences.theme);
+      document.documentElement.setAttribute('lang', preferences.lang);
+    }
+  }, [preferences.theme, preferences.lang, isLoaded]);
+
+  // 3. Save to localStorage whenever preferences change (after loaded)
   const updatePreferences = useCallback((updater: (prev: UserPreferences) => UserPreferences) => {
     setPreferences((prev) => {
       const next = updater(prev);
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
       } catch {
-        // Ignore write errors (e.g. private mode quota)
+        // Ignore write errors (e.g. private browsing quota)
       }
       return next;
     });
   }, []);
 
   const toggleTheme = useCallback(() => {
-    updatePreferences((prev) => {
-      const nextTheme = prev.theme === 'dark' ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', nextTheme);
-      return { ...prev, theme: nextTheme };
-    });
+    updatePreferences((prev) => ({
+      ...prev,
+      theme: prev.theme === 'dark' ? 'light' : 'dark',
+    }));
   }, [updatePreferences]);
 
   const toggleLang = useCallback(() => {
-    updatePreferences((prev) => {
-      const nextLang: Language = prev.lang === 'sv' ? 'en' : 'sv';
-      document.documentElement.setAttribute('lang', nextLang);
-      return { ...prev, lang: nextLang };
-    });
+    updatePreferences((prev) => ({
+      ...prev,
+      lang: prev.lang === 'sv' ? 'en' : 'sv',
+    }));
   }, [updatePreferences]);
 
   const setSelectedOs = useCallback(
@@ -135,6 +160,15 @@ export function usePreferences() {
     updatePreferences((prev) => ({ ...prev, showOnlyAvailable: !prev.showOnlyAvailable }));
   }, [updatePreferences]);
 
+  const resetFilters = useCallback(() => {
+    updatePreferences((prev) => ({
+      ...prev,
+      selectedOs: 'all',
+      selectedBuildings: [],
+      showOnlyAvailable: false,
+    }));
+  }, [updatePreferences]);
+
   return {
     preferences,
     isLoaded,
@@ -144,5 +178,6 @@ export function usePreferences() {
     toggleBuilding,
     clearBuildings,
     toggleShowOnlyAvailable,
+    resetFilters,
   };
 }

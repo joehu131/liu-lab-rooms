@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import useSWR from 'swr';
 import { ScheduleResponse, RoomAvailability } from '@/types';
 import { calculateAllRoomsAvailability } from '@/lib/availability';
@@ -29,6 +29,7 @@ export default function HomePage() {
     toggleBuilding,
     clearBuildings,
     toggleShowOnlyAvailable,
+    resetFilters,
   } = usePreferences();
 
   const { theme, lang, selectedOs, selectedBuildings, showOnlyAvailable } = preferences;
@@ -167,12 +168,10 @@ export default function HomePage() {
   const linuxCount = allAvailabilities.filter((a) => a.room.os === 'linux').length;
   const windowsCount = allAvailabilities.filter((a) => a.room.os === 'windows').length;
 
-  const handleResetFilters = () => {
-    setSelectedOs('all');
-    clearBuildings();
-    if (showOnlyAvailable) toggleShowOnlyAvailable();
+  const handleResetFilters = useCallback(() => {
+    resetFilters();
     setSearchQuery('');
-  };
+  }, [resetFilters]);
 
   return (
     <div className="min-h-screen flex flex-col justify-between">
