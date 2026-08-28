@@ -130,35 +130,74 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         <div className="w-full sm:w-auto flex items-center gap-1 p-0.5 rounded-lg bg-[var(--panel)] border border-[var(--rule)] shrink-0">
           <button
             onClick={() => onSelectOs('all')}
-            className={`flex-1 sm:flex-initial px-2.5 py-1 rounded-md text-xs font-mono transition-all min-h-[32px] touch-manipulation cursor-pointer flex items-center justify-center text-center ${
+            className={`flex-1 sm:flex-initial px-2 sm:px-2.5 py-1 rounded-md text-xs font-mono transition-all min-h-[32px] touch-manipulation cursor-pointer flex items-center justify-center gap-1 text-center ${
               selectedOs === 'all'
                 ? 'bg-slate-200 text-slate-900 dark:bg-[var(--ink)] dark:text-[var(--bg-bot)] font-semibold shadow-sm'
                 : 'text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--panel-hover)]'
             }`}
           >
-            {t.allPill(totalCount)}
+            <span>{lang === 'en' ? 'All' : 'Alla'}</span>
+            <span>(</span>
+            <span
+              className={
+                totalCount === 0
+                  ? selectedOs === 'all'
+                    ? 'text-red-600 dark:text-red-400 font-bold'
+                    : 'text-status-busy font-bold'
+                  : ''
+              }
+            >
+              {totalCount}
+            </span>
+            <span>)</span>
           </button>
           <button
             onClick={() => onSelectOs('linux')}
-            className={`flex-1 sm:flex-initial px-2.5 py-1 rounded-md text-xs font-mono transition-all min-h-[32px] touch-manipulation flex items-center justify-center gap-1.5 cursor-pointer text-center ${
+            className={`flex-1 sm:flex-initial px-2 sm:px-2.5 py-1 rounded-md text-xs font-mono transition-all min-h-[32px] touch-manipulation flex items-center justify-center gap-1 cursor-pointer text-center ${
               selectedOs === 'linux'
                 ? 'bg-accent-win text-white font-semibold shadow-sm'
                 : 'text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--panel-hover)]'
             }`}
           >
-            <span>🐧</span>
-            <span>{t.linuxPill(linuxCount)}</span>
+            <span className="shrink-0">🐧</span>
+            <span>Linux</span>
+            <span>(</span>
+            <span
+              className={
+                linuxCount === 0
+                  ? selectedOs === 'linux'
+                    ? 'text-red-200 font-bold'
+                    : 'text-status-busy font-bold'
+                  : ''
+              }
+            >
+              {linuxCount}
+            </span>
+            <span>)</span>
           </button>
           <button
             onClick={() => onSelectOs('windows')}
-            className={`flex-1 sm:flex-initial px-2.5 py-1 rounded-md text-xs font-mono transition-all min-h-[32px] touch-manipulation flex items-center justify-center gap-1.5 cursor-pointer text-center ${
+            className={`flex-1 sm:flex-initial px-2 sm:px-2.5 py-1 rounded-md text-xs font-mono transition-all min-h-[32px] touch-manipulation flex items-center justify-center gap-1 cursor-pointer text-center ${
               selectedOs === 'windows'
                 ? 'bg-accent-linux text-white font-semibold shadow-sm'
                 : 'text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--panel-hover)]'
             }`}
           >
-            <WindowsIcon className="w-3 h-3" />
-            <span>{t.windowsPill(windowsCount)}</span>
+            <WindowsIcon className="w-3 h-3 shrink-0" />
+            <span>Windows</span>
+            <span>(</span>
+            <span
+              className={
+                windowsCount === 0
+                  ? selectedOs === 'windows'
+                    ? 'text-red-200 font-bold'
+                    : 'text-status-busy font-bold'
+                  : ''
+              }
+            >
+              {windowsCount}
+            </span>
+            <span>)</span>
           </button>
         </div>
 

@@ -1,6 +1,9 @@
 {
   "name": "liu-lab-rooms",
   "version": "1.0.0",
+  "description": "Real-time and simulated availability for all 42 computer lab rooms on Linköping University Campus Valla",
+  "author": "Joel Hultman",
+  "license": "GPL-3.0-or-later",
   "private": true,
   "scripts": {
     "dev": "next dev",

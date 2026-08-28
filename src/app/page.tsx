@@ -164,9 +164,16 @@ export default function HomePage() {
     return result;
   }, [allAvailabilities, selectedOs, selectedBuildings, showOnlyAvailable, searchQuery]);
 
+  // Free room counts (reactive to active building filter)
+  const scopedByBuilding = useMemo(() => {
+    if (selectedBuildings.length === 0) return allAvailabilities;
+    return allAvailabilities.filter((a) => selectedBuildings.includes(a.room.building));
+  }, [allAvailabilities, selectedBuildings]);
+
   const freeCount = allAvailabilities.filter((a) => a.status !== 'BUSY').length;
-  const linuxCount = allAvailabilities.filter((a) => a.room.os === 'linux').length;
-  const windowsCount = allAvailabilities.filter((a) => a.room.os === 'windows').length;
+  const freePillTotal = scopedByBuilding.filter((a) => a.status !== 'BUSY').length;
+  const freeLinuxCount = scopedByBuilding.filter((a) => a.room.os === 'linux' && a.status !== 'BUSY').length;
+  const freeWindowsCount = scopedByBuilding.filter((a) => a.room.os === 'windows' && a.status !== 'BUSY').length;
 
   const handleResetFilters = useCallback(() => {
     resetFilters();
@@ -230,9 +237,9 @@ export default function HomePage() {
           onToggleShowOnlyAvailable={toggleShowOnlyAvailable}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          linuxCount={linuxCount}
-          windowsCount={windowsCount}
-          totalCount={allAvailabilities.length}
+          linuxCount={freeLinuxCount}
+          windowsCount={freeWindowsCount}
+          totalCount={freePillTotal}
           onOpenTimeMachine={() => setIsTimeMachineOpen(true)}
           isSimulating={simulatedTimeMs !== null}
           lang={lang}
