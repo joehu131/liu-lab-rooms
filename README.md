@@ -8,7 +8,7 @@ A fast, mobile-friendly web app showing real-time computer lab availability at L
 
 ## Features
 
-- **Live Availability**: Displays whether each of the 42 computer labs on Campus Valla is free, ending soon, or occupied.
+- **Live Availability**: See if the 42 computer labs on Campus Valla is free, ending soon, or occupied.
 - **Future Schedules**: Pick any day and time over the next 14 days to see upcoming room schedules.
 - **Campus Navigation**: Direct links to Mazemap indoor navigation for every lab.
 - **Filters & Search**: Filter by OS (Linux/Windows), building (B-huset, A-huset...), or free-only.
