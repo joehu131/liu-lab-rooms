@@ -37,13 +37,41 @@ export const viewport: Viewport = {
   ],
 };
 
+const themeInitializerScript = `
+(function() {
+  try {
+    var saved = localStorage.getItem('liu-labs-preferences-v1');
+    if (saved) {
+      var parsed = JSON.parse(saved);
+      if (parsed.theme === 'light' || parsed.theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', parsed.theme);
+      }
+      if (parsed.lang === 'en' || parsed.lang === 'sv') {
+        document.documentElement.setAttribute('lang', parsed.lang);
+      }
+      return;
+    }
+    var oldTheme = localStorage.getItem('liu-labs-theme');
+    if (oldTheme === 'light' || oldTheme === 'dark') {
+      document.documentElement.setAttribute('data-theme', oldTheme);
+      return;
+    }
+    // Default is light mode
+    document.documentElement.setAttribute('data-theme', 'light');
+  } catch (e) {}
+})();
+`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="sv" data-theme="dark" className={`${ibmPlexSans.variable} ${ibmPlexMono.variable}`} suppressHydrationWarning>
+    <html lang="sv" data-theme="light" className={`${ibmPlexSans.variable} ${ibmPlexMono.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitializerScript }} />
+      </head>
       <body className="antialiased selection:bg-accent-linux selection:text-white font-sans">
         {children}
         <Analytics />

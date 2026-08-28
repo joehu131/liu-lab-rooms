@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { formatStockholmTime, formatWeekdayLabel } from '@/lib/formatters';
+import { Language, translations } from '@/lib/i18n';
 
 interface HeroClockProps {
   simulatedTimeMs: number | null;
@@ -9,6 +10,7 @@ interface HeroClockProps {
   freeRoomsCount: number;
   totalRoomsCount: number;
   isLoading?: boolean;
+  lang?: Language;
 }
 
 export const HeroClock: React.FC<HeroClockProps> = ({
@@ -17,8 +19,11 @@ export const HeroClock: React.FC<HeroClockProps> = ({
   freeRoomsCount,
   totalRoomsCount,
   isLoading = false,
+  lang = 'sv',
 }) => {
   const [liveTimeMs, setLiveTimeMs] = useState<number>(() => Date.now());
+
+  const t = translations[lang];
 
   // Isolated 1-second tick timer for the clock display
   useEffect(() => {
@@ -37,8 +42,9 @@ export const HeroClock: React.FC<HeroClockProps> = ({
 
   const isSimulating = simulatedTimeMs !== null;
 
-  // Format date in Swedish: e.g. "FREDAG • 28 AUGUSTI"
-  const dateFormatter = new Intl.DateTimeFormat('sv-SE', {
+  // Format date in Swedish or English: e.g. "FREDAG • 28 AUGUSTI" or "FRIDAY • AUGUST 28"
+  const locale = lang === 'en' ? 'en-US' : 'sv-SE';
+  const dateFormatter = new Intl.DateTimeFormat(locale, {
     timeZone: 'Europe/Stockholm',
     weekday: 'long',
     day: 'numeric',
@@ -49,7 +55,9 @@ export const HeroClock: React.FC<HeroClockProps> = ({
   const weekday = parts.find((p) => p.type === 'weekday')?.value || '';
   const day = parts.find((p) => p.type === 'day')?.value || '';
   const month = parts.find((p) => p.type === 'month')?.value || '';
-  const dateFormatted = `${weekday} • ${day} ${month}`.toUpperCase();
+  const dateFormatted = lang === 'en'
+    ? `${weekday} • ${month} ${day}`.toUpperCase()
+    : `${weekday} • ${day} ${month}`.toUpperCase();
 
   return (
     <section className="w-full max-w-5xl mx-auto px-4 pt-2 sm:pt-4 pb-2 sm:pb-3 text-center">
@@ -86,20 +94,25 @@ export const HeroClock: React.FC<HeroClockProps> = ({
             className="font-mono text-xs sm:text-sm tracking-wider uppercase text-[var(--ink-3)] flex items-center gap-2"
           >
             <span className="w-2 h-2 rounded-full bg-accent-linux animate-pulse" />
-            <span>HÄMTAR SALSTILLGÅNG FRÅN TIMEEDIT...</span>
+            <span>{t.loadingStatus}</span>
           </div>
         ) : isSimulating ? (
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-medium bg-status-sim/15 text-status-sim border border-status-sim/30">
             <span className="w-2 h-2 rounded-full bg-status-sim shadow-[0_0_8px_var(--status-sim)] animate-pulse" />
             <span>
-              SIMULERAR: {formatWeekdayLabel(displayTimeMs)} {hrs}:{mins} • {freeRoomsCount} / {totalRoomsCount} SALAR LEDIGA
+              {t.simulatingStatus(
+                formatWeekdayLabel(displayTimeMs, Date.now(), lang),
+                `${hrs}:${mins}`,
+                freeRoomsCount,
+                totalRoomsCount
+              )}
             </span>
             <button
               onClick={onResetTimeMachine}
               className="ml-1 text-[var(--ink)] hover:text-white underline font-semibold cursor-pointer"
-              title="Återgå till realtid"
+              title={t.resetLiveTitle}
             >
-              [Återställ]
+              [{t.resetLive}]
             </button>
           </div>
         ) : (
@@ -109,7 +122,7 @@ export const HeroClock: React.FC<HeroClockProps> = ({
           >
             <span className="w-2 h-2 rounded-full bg-status-free shadow-[0_0_6px_var(--status-free)]" />
             <span>
-              LIVE • {freeRoomsCount} AV {totalRoomsCount} DATORSALAR LEDIGA JUST NU
+              {t.liveStatus(freeRoomsCount, totalRoomsCount)}
             </span>
           </div>
         )}

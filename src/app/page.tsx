@@ -9,7 +9,9 @@ import { HeroClock } from '@/components/HeroClock';
 import { FilterBar } from '@/components/FilterBar';
 import { RoomList } from '@/components/RoomList';
 import { TimeMachineModal } from '@/components/TimeMachineModal';
-import { Loader2, AlertCircle } from 'lucide-react';
+import { translations } from '@/lib/i18n';
+import { usePreferences } from '@/lib/usePreferences';
+import { AlertCircle } from 'lucide-react';
 
 const fetcher = (url: string) =>
   fetch(url).then((res) => {
@@ -18,6 +20,20 @@ const fetcher = (url: string) =>
   });
 
 export default function HomePage() {
+  // Persistent User Preferences (Theme, Language, OS, Buildings, Available Only)
+  const {
+    preferences,
+    toggleTheme,
+    toggleLang,
+    setSelectedOs,
+    toggleBuilding,
+    clearBuildings,
+    toggleShowOnlyAvailable,
+  } = usePreferences();
+
+  const { theme, lang, selectedOs, selectedBuildings, showOnlyAvailable } = preferences;
+  const t = translations[lang];
+
   // SWR for fetching schedule data with automatic background refresh
   const { data: schedule, error, isLoading, mutate } = useSWR<ScheduleResponse>(
     '/api/rooms',
@@ -29,10 +45,13 @@ export default function HomePage() {
     }
   );
 
-  // Time & Simulation State
+  // Time & Simulation State (Always strictly live realtime on page load)
   const [simulatedTimeMs, setSimulatedTimeMs] = useState<number | null>(null);
   const [isTimeMachineOpen, setIsTimeMachineOpen] = useState(false);
   const [nowMinute, setNowMinute] = useState<number>(() => Math.floor(Date.now() / 60000));
+
+  // Search query (Always starts blank on page load)
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   // Update current minute boundary every 15 seconds
   useEffect(() => {
@@ -41,12 +60,6 @@ export default function HomePage() {
     }, 15000);
     return () => clearInterval(interval);
   }, []);
-
-  // Filter State
-  const [selectedOs, setSelectedOs] = useState<'all' | 'linux' | 'windows'>('all');
-  const [selectedBuilding, setSelectedBuilding] = useState<string>('All');
-  const [showOnlyAvailable, setShowOnlyAvailable] = useState<boolean>(false);
-  const [searchQuery, setSearchQuery] = useState<string>('');
 
   // Active evaluation timestamp
   const activeEvalTimeMs = simulatedTimeMs ?? nowMinute * 60000;
@@ -80,9 +93,9 @@ export default function HomePage() {
       result = result.filter((a) => a.room.os === selectedOs);
     }
 
-    // Building Filter
-    if (selectedBuilding !== 'All') {
-      result = result.filter((a) => a.room.building === selectedBuilding);
+    // Multi-Building Filter
+    if (selectedBuildings.length > 0) {
+      result = result.filter((a) => selectedBuildings.includes(a.room.building));
     }
 
     // Available Only Filter
@@ -148,7 +161,7 @@ export default function HomePage() {
     });
 
     return result;
-  }, [allAvailabilities, selectedOs, selectedBuilding, showOnlyAvailable, searchQuery]);
+  }, [allAvailabilities, selectedOs, selectedBuildings, showOnlyAvailable, searchQuery]);
 
   const freeCount = allAvailabilities.filter((a) => a.status !== 'BUSY').length;
   const linuxCount = allAvailabilities.filter((a) => a.room.os === 'linux').length;
@@ -156,19 +169,23 @@ export default function HomePage() {
 
   const handleResetFilters = () => {
     setSelectedOs('all');
-    setSelectedBuilding('All');
-    setShowOnlyAvailable(false);
+    clearBuildings();
+    if (showOnlyAvailable) toggleShowOnlyAvailable();
     setSearchQuery('');
   };
 
   return (
     <div className="min-h-screen flex flex-col justify-between">
       <div>
-        {/* Header with Theme Toggle & Info */}
+        {/* Header with Persistent Theme & Language Toggle & Info */}
         <Header
           onRefresh={() => mutate()}
           isLoading={isLoading}
           lastUpdated={schedule?.fetchedAt}
+          lang={lang}
+          onToggleLang={toggleLang}
+          theme={theme}
+          onToggleTheme={toggleTheme}
         />
 
         {/* Hero Clock */}
@@ -178,66 +195,81 @@ export default function HomePage() {
           freeRoomsCount={freeCount}
           totalRoomsCount={allAvailabilities.length}
           isLoading={isLoading && !schedule}
+          lang={lang}
         />
 
         {/* Loading / Error States */}
-        {error && (
+        {error && !schedule && (
           <div className="w-full max-w-5xl mx-auto px-4 mb-4">
-            <div className="p-3 rounded-lg bg-status-busy/15 border border-status-busy/30 text-xs font-mono text-status-busy flex items-center gap-2">
-              <AlertCircle size={15} />
-              <span>{error.message || 'Kunde inte hämta schemadata. Försöker igen...'}</span>
+            <div className="panel p-3 bg-status-busy/10 border-status-busy/30 text-status-busy flex items-center justify-between text-xs font-mono">
+              <div className="flex items-center gap-2">
+                <AlertCircle size={15} />
+                <span>
+                  {lang === 'en'
+                    ? 'Failed to fetch schedule from TimeEdit. Showing cached/fallback data.'
+                    : 'Kunde inte hämta schema från TimeEdit. Visar cachelagrad data.'}
+                </span>
+              </div>
+              <button
+                onClick={() => mutate()}
+                className="underline hover:text-white cursor-pointer"
+              >
+                {lang === 'en' ? 'Retry' : 'Försök igen'}
+              </button>
             </div>
           </div>
         )}
 
-        {isLoading && !schedule && (
-          <div className="w-full max-w-5xl mx-auto px-4 py-8 text-center text-xs font-mono text-[var(--ink-3)] flex items-center justify-center gap-2">
-            <Loader2 size={16} className="animate-spin text-accent-linux" />
-            <span>Hämtar datorsalsscheman från TimeEdit...</span>
-          </div>
-        )}
+        {/* Filter Bar with Persistent Filters */}
+        <FilterBar
+          selectedOs={selectedOs}
+          onSelectOs={setSelectedOs}
+          selectedBuildings={selectedBuildings}
+          onToggleBuilding={toggleBuilding}
+          onClearBuildings={clearBuildings}
+          showOnlyAvailable={showOnlyAvailable}
+          onToggleShowOnlyAvailable={toggleShowOnlyAvailable}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          linuxCount={linuxCount}
+          windowsCount={windowsCount}
+          totalCount={allAvailabilities.length}
+          onOpenTimeMachine={() => setIsTimeMachineOpen(true)}
+          isSimulating={simulatedTimeMs !== null}
+          lang={lang}
+        />
 
-        {/* Filter Controls */}
-        {schedule && (
-          <FilterBar
-            selectedOs={selectedOs}
-            onSelectOs={setSelectedOs}
-            selectedBuilding={selectedBuilding}
-            onSelectBuilding={setSelectedBuilding}
-            showOnlyAvailable={showOnlyAvailable}
-            onToggleShowOnlyAvailable={() => setShowOnlyAvailable(!showOnlyAvailable)}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            linuxCount={linuxCount}
-            windowsCount={windowsCount}
-            totalCount={allAvailabilities.length}
-            onOpenTimeMachine={() => setIsTimeMachineOpen(true)}
-            isSimulating={simulatedTimeMs !== null}
-          />
-        )}
-
-        {/* Room Rows List */}
-        {schedule && (
-          <RoomList
-            availabilities={filteredAndSortedRooms}
-            currentHour={currentHour}
-            onResetFilters={handleResetFilters}
-          />
-        )}
+        {/* Room List */}
+        <RoomList
+          availabilities={filteredAndSortedRooms}
+          currentHour={currentHour}
+          onResetFilters={handleResetFilters}
+          lang={lang}
+        />
       </div>
 
-      {/* Footer info */}
-      <footer className="w-full max-w-5xl mx-auto px-4 py-6 border-t border-[var(--rule)] text-center text-[11px] font-mono text-[var(--ink-3)]">
-        <span>Linköping University • Campus Valla • Salsschema TimeEdit</span>
+      {/* Footer */}
+      <footer className="w-full border-t border-[var(--rule-faint)] py-4 text-center text-[11px] font-mono text-[var(--ink-3)] flex items-center justify-center gap-1.5 flex-nowrap px-2">
+        <span>{t.footerText}</span>
+        <span>•</span>
+        <a
+          href="https://github.com/joehu131/liu-lab-rooms"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:text-[var(--ink)] underline transition-colors shrink-0"
+        >
+          github
+        </a>
       </footer>
 
-      {/* Time Machine Modal Drawer */}
+      {/* Time Machine Modal */}
       <TimeMachineModal
         isOpen={isTimeMachineOpen}
         onClose={() => setIsTimeMachineOpen(false)}
-        currentTimeMs={Date.now()}
+        currentTimeMs={nowMinute * 60000}
         simulatedTimeMs={simulatedTimeMs}
-        onApplySimulation={(targetMs) => setSimulatedTimeMs(targetMs)}
+        onApplySimulation={setSimulatedTimeMs}
+        lang={lang}
       />
     </div>
   );

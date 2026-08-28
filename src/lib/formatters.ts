@@ -1,3 +1,5 @@
+import { Language } from './i18n';
+
 /**
  * Format a duration in minutes into a clean human string, e.g. "2h 45m", "30m", "< 1m"
  */
@@ -40,17 +42,22 @@ export function formatStockholmDate(epochMs: number): string {
 /**
  * Format date to weekday short name in Swedish or English, e.g. "Idag", "Imorgon", "Mån", "Tis", etc.
  */
-export function formatWeekdayLabel(epochMs: number, referenceMs: number = Date.now()): string {
+export function formatWeekdayLabel(
+  epochMs: number,
+  referenceMs: number = Date.now(),
+  lang: Language = 'sv'
+): string {
   const refDateStr = formatStockholmDate(referenceMs);
   const targetDateStr = formatStockholmDate(epochMs);
 
   const tomorrowMs = referenceMs + 24 * 60 * 60 * 1000;
   const tomorrowDateStr = formatStockholmDate(tomorrowMs);
 
-  if (targetDateStr === refDateStr) return 'Idag';
-  if (targetDateStr === tomorrowDateStr) return 'Imorgon';
+  if (targetDateStr === refDateStr) return lang === 'en' ? 'Today' : 'Idag';
+  if (targetDateStr === tomorrowDateStr) return lang === 'en' ? 'Tomorrow' : 'Imorgon';
 
-  const formatter = new Intl.DateTimeFormat('sv-SE', {
+  const locale = lang === 'en' ? 'en-US' : 'sv-SE';
+  const formatter = new Intl.DateTimeFormat(locale, {
     timeZone: 'Europe/Stockholm',
     weekday: 'short',
     day: 'numeric',

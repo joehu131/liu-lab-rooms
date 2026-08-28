@@ -2,10 +2,12 @@
 
 import React from 'react';
 import { GanttSegment } from '@/types';
+import { Language } from '@/lib/i18n';
 
 interface GanttRibbonProps {
   segments: GanttSegment[];
   currentHour?: number; // 7.0 to 21.0
+  lang?: Language;
 }
 
 const LIU_PASSES = [
@@ -18,7 +20,9 @@ const LIU_PASSES = [
   { label: '19:00', hour: 19.0 },
 ];
 
-export const GanttRibbon: React.FC<GanttRibbonProps> = ({ segments, currentHour }) => {
+export const GanttRibbon: React.FC<GanttRibbonProps> = ({ segments, currentHour, lang = 'sv' }) => {
+  const isEn = lang === 'en';
+
   return (
     <div className="w-full mt-2 select-none">
       {/* LiU Hourly Event Ticks (Exact Geometric Coordinates) */}
@@ -58,7 +62,11 @@ export const GanttRibbon: React.FC<GanttRibbonProps> = ({ segments, currentHour 
               style={{ width: `${widthPercent}%` }}
               title={
                 seg.isOccupied
-                  ? `Bokat (${seg.courseCode || 'Upptagen'})`
+                  ? isEn
+                    ? `Booked (${seg.courseCode || 'Occupied'})`
+                    : `Bokat (${seg.courseCode || 'Upptagen'})`
+                  : isEn
+                  ? 'Available'
                   : 'Ledigt'
               }
               className={`h-full relative z-0 transition-colors ${
@@ -75,7 +83,7 @@ export const GanttRibbon: React.FC<GanttRibbonProps> = ({ segments, currentHour 
           <div
             style={{ left: `${((currentHour - 7) / 14) * 100}%` }}
             className="absolute top-0 bottom-0 w-0.5 bg-white shadow-[0_0_6px_rgba(255,255,255,0.9)] z-10 -translate-x-1/2 pointer-events-none"
-            title={`Tid: ${Math.floor(currentHour)}:${String(Math.floor((currentHour % 1) * 60)).padStart(2, '0')}`}
+            title={`${isEn ? 'Time' : 'Tid'}: ${Math.floor(currentHour)}:${String(Math.floor((currentHour % 1) * 60)).padStart(2, '0')}`}
           />
         )}
       </div>
