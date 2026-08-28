@@ -13,7 +13,7 @@ export const translations = {
     // Hero Clock & Live status
     liveStatus: (free: number, total: number) => `LIVE • ${free} AV ${total} DATORSALAR LEDIGA JUST NU`,
     simulatingStatus: (date: string, time: string, free: number, total: number) =>
-      `SIMULERAR: ${date} ${time} • ${free} / ${total} SALAR LEDIGA`,
+      `${date} ${time} • ${free} / ${total} SALAR LEDIGA`,
     loadingStatus: 'HÄMTAR SALSTILLGÅNG FRÅN TIMEEDIT...',
     resetLive: 'Återställ',
     resetLiveTitle: 'Återgå till realtid',
@@ -48,13 +48,12 @@ export const translations = {
     findOnMazemap: (room: string) => `Hitta ${room} på Mazemap`,
     roomSchedule: 'Salsschema (07:00 – 21:00)',
     bookingsTitle: (count: number) => `Bokningar (${count}):`,
-    noBookingsToday: 'Inga bokningar under dagen • Salen är ledig hela dagen',
+    noBookingsToday: 'Inga bokningar under dagen',
     noRoomsMatch: 'Inga salar matchar dina valda filter',
     noRoomsMatchSub: 'Prova att ändra operativsystem, byggnad eller sökord.',
 
     // Time Machine Modal
     timeMachineTitle: 'Framtida saltillgång',
-    timeMachineSub: 'Simulera salsbeläggning vid vald tidpunkt och dag (14-dagars fönster)',
     selectDay: 'Välj dag',
     today: 'Idag',
     tomorrow: 'Imorgon',
@@ -78,7 +77,7 @@ export const translations = {
     // Hero Clock & Live status
     liveStatus: (free: number, total: number) => `LIVE • ${free} OF ${total} COMPUTER LABS AVAILABLE NOW`,
     simulatingStatus: (date: string, time: string, free: number, total: number) =>
-      `SIMULATING: ${date} ${time} • ${free} / ${total} LABS FREE`,
+      `${date} ${time} • ${free} / ${total} LABS FREE`,
     loadingStatus: 'FETCHING LAB AVAILABILITY FROM TIMEEDIT...',
     resetLive: 'Reset',
     resetLiveTitle: 'Return to live time',
@@ -113,13 +112,12 @@ export const translations = {
     findOnMazemap: (room: string) => `Find ${room} on Mazemap`,
     roomSchedule: 'Lab Schedule (07:00 – 21:00)',
     bookingsTitle: (count: number) => `Bookings (${count}):`,
-    noBookingsToday: 'No bookings scheduled • Room is free all day',
+    noBookingsToday: 'No bookings scheduled today',
     noRoomsMatch: 'No lab rooms match your selected filters',
     noRoomsMatchSub: 'Try changing your OS, building filter, or search query.',
 
     // Time Machine Modal
     timeMachineTitle: 'Future Lab Availability',
-    timeMachineSub: 'Simulate computer lab occupancy at any chosen date and time (14-day window)',
     selectDay: 'Select day',
     today: 'Today',
     tomorrow: 'Tomorrow',

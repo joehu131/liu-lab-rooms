@@ -160,32 +160,34 @@ const RoomCardComponent: React.FC<RoomCardProps> = ({
           id={`room-schedule-${room.id}`}
           className="px-3 py-2.5 bg-transparent border-t border-[var(--rule-faint)] space-y-2.5 animate-fadeIn text-xs font-mono"
         >
-          {/* Top Specs & Mazemap Row */}
-          <div className="flex flex-wrap items-center justify-between gap-2 pb-1.5 border-b border-[var(--rule-faint)]">
-            <div className="flex items-center gap-3 sm:gap-4 flex-wrap text-[11px] text-[var(--ink-2)]">
-              <div className="flex items-center gap-1.5">
+          {/* Top Specs & Mazemap Row (Fits on 1 line on mobile) */}
+          <div className="flex items-center justify-between gap-1.5 sm:gap-2 pb-1.5 border-b border-[var(--rule-faint)] flex-nowrap overflow-x-auto">
+            <div className="flex items-center gap-2 sm:gap-4 flex-nowrap text-[10.5px] sm:text-[11px] text-[var(--ink-2)] shrink-0">
+              <div className="flex items-center gap-1 sm:gap-1.5">
                 <Building size={12} className="text-accent-linux shrink-0" />
                 <span>{room.building}, {t.floor} {room.floor}</span>
               </div>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1 sm:gap-1.5">
                 <Monitor size={12} className="text-accent-linux shrink-0" />
-                <span>{room.computers} ({isLinux ? 'Linux' : 'Windows'})</span>
+                <span>{room.computers} ({isLinux ? 'Linux' : 'Win'})</span>
               </div>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1 sm:gap-1.5">
                 <Users size={12} className="text-accent-linux shrink-0" />
                 <span>{room.seats}</span>
               </div>
             </div>
 
-            {/* Mazemap Link on the Top Row */}
+            {/* Mazemap Link: "Map" on mobile, full label on desktop */}
             <a
               href={room.mazemapUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="panel px-2.5 py-1 text-[11px] font-mono text-[var(--ink)] hover:text-accent-linux hover:border-accent-linux transition-colors flex items-center gap-1.5 shrink-0"
+              className="panel px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10.5px] sm:text-[11px] font-mono text-[var(--ink)] hover:text-accent-linux hover:border-accent-linux transition-colors flex items-center gap-1 sm:gap-1.5 shrink-0"
+              title={`${t.openMazemap} (${t.floor} ${room.floor})`}
             >
-              <MapPin size={12} className="text-accent-linux" />
-              <span>{t.openMazemap} ({t.floor} {room.floor})</span>
+              <MapPin size={11} className="text-accent-linux shrink-0" />
+              <span className="sm:hidden">Map</span>
+              <span className="hidden sm:inline">{t.openMazemap} ({t.floor} {room.floor})</span>
             </a>
           </div>
 
