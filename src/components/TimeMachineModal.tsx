@@ -164,7 +164,7 @@ export const TimeMachineModal: React.FC<TimeMachineModalProps> = ({
         <div className="flex items-center justify-between pb-3 mb-4 border-b border-[var(--rule)]">
           <div className="flex items-center gap-2">
             <Calendar size={18} className="text-amber-500 dark:text-amber-400" />
-            <h2 id="time-machine-title" className="font-mono text-sm font-semibold tracking-wider uppercase text-[var(--ink)]">
+            <h2 id="time-machine-title" className="font-sans text-sm font-semibold tracking-wide uppercase text-[var(--ink)]">
               {t.timeMachineTitle}
             </h2>
           </div>
@@ -179,14 +179,14 @@ export const TimeMachineModal: React.FC<TimeMachineModalProps> = ({
 
         {/* Section 1: Choose Day (14 Days grid) */}
         <div className="mb-5">
-          <div className="text-xs font-semibold text-[var(--ink)] mb-2 font-mono flex items-center justify-between">
+          <div className="text-xs font-semibold text-[var(--ink)] mb-2 font-sans flex items-center justify-between">
             <span>1. {t.selectDay}</span>
             <span className="text-[var(--ink-3)] font-normal">
               {selectedDateStr}
             </span>
           </div>
 
-          <div className="grid grid-cols-7 gap-1.5 font-mono">
+          <div className="grid grid-cols-7 gap-1.5 font-sans">
             {fourteenDays.map((day) => {
               const isSelected = day.dateStr === selectedDateStr;
               return (
@@ -199,7 +199,7 @@ export const TimeMachineModal: React.FC<TimeMachineModalProps> = ({
                       : 'panel hover:bg-[var(--panel-hover)] text-[var(--ink-2)]'
                   }`}
                 >
-                  <span className={`text-[9px] uppercase ${isSelected ? 'text-slate-900 font-semibold' : 'text-[var(--ink-3)]'}`}>
+                  <span className={`text-[10px] uppercase ${isSelected ? 'text-slate-900 font-semibold' : 'text-[var(--ink-3)]'}`}>
                     {day.isToday ? t.today : day.isTomorrow ? t.tomorrow : day.weekday}
                   </span>
                   <span className={`text-xs font-semibold mt-0.5 ${isSelected ? 'text-slate-950 font-bold' : ''}`}>
@@ -213,14 +213,14 @@ export const TimeMachineModal: React.FC<TimeMachineModalProps> = ({
 
         {/* Section 2: LiU Lecture Passes Presets */}
         <div className="mb-4">
-          <div className="text-xs font-semibold text-[var(--ink)] mb-2 font-mono flex items-center justify-between">
+          <div className="text-xs font-semibold text-[var(--ink)] mb-2 font-sans flex items-center justify-between">
             <span>2. {t.lecturePasses}</span>
-            <span className="text-[var(--ink-3)] font-normal text-[11px]">
+            <span className="text-[var(--ink-3)] font-normal text-xs">
               {selectedTimeStr}
             </span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 font-mono text-xs">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 font-sans text-xs">
             {LIU_PASS_PRESETS.map((pass) => {
               const [pH, pM] = pass.time.split(':').map(Number);
               const passMinutes = pH * 60 + pM;
@@ -254,7 +254,7 @@ export const TimeMachineModal: React.FC<TimeMachineModalProps> = ({
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-[var(--rule-faint)]" />
           </div>
-          <div className="relative flex justify-center text-[10px] uppercase font-mono">
+          <div className="relative flex justify-center text-xs uppercase font-sans">
             <span className="bg-[var(--panel-solid)] px-2 text-[var(--ink-3)]">
               {isEn ? 'or exact time' : 'eller exakt tid'}
             </span>
@@ -263,12 +263,12 @@ export const TimeMachineModal: React.FC<TimeMachineModalProps> = ({
 
         {/* Section 2 (B): Exact Time Slider (Spans full 07:00 to 21:00 with past time greyed out) */}
         <div className="mb-6">
-          <div className="flex items-center justify-between text-xs font-semibold text-[var(--ink)] mb-2 font-mono">
+          <div className="flex items-center justify-between text-xs font-semibold text-[var(--ink)] mb-2 font-sans">
             <span className="flex items-center gap-1.5">
               <Clock size={13} className="text-amber-500 dark:text-amber-400" />
               <span>2. {t.exactTime}</span>
             </span>
-            <span className="text-sm font-mono text-amber-900 dark:text-amber-300 font-bold px-2 py-0.5 rounded bg-amber-300/30 dark:bg-amber-400/20">
+            <span className="text-sm font-sans text-amber-900 dark:text-amber-300 font-bold px-2 py-0.5 rounded bg-amber-300/30 dark:bg-amber-400/20">
               {selectedTimeStr}
             </span>
           </div>
@@ -293,7 +293,7 @@ export const TimeMachineModal: React.FC<TimeMachineModalProps> = ({
             />
           </div>
 
-          <div className="flex justify-between text-[10px] font-mono text-[var(--ink-3)] mt-1">
+          <div className="flex justify-between text-[11px] font-sans text-[var(--ink-3)] mt-1">
             <span>07:00</span>
             <span>12:00</span>
             <span>17:00</span>
@@ -302,7 +302,7 @@ export const TimeMachineModal: React.FC<TimeMachineModalProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-between gap-3 pt-3 border-t border-[var(--rule)] font-mono text-xs">
+        <div className="flex items-center justify-between gap-3 pt-3 border-t border-[var(--rule)] font-sans text-xs">
           {simulatedTimeMs !== null ? (
             <button
               onClick={handleResetToRealtime}

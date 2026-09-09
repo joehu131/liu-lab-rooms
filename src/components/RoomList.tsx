@@ -26,7 +26,7 @@ export const RoomList: React.FC<RoomListProps> = ({
       <div className="w-full max-w-5xl mx-auto px-4 py-12 text-center">
         <div className="panel max-w-md mx-auto p-6 flex flex-col items-center justify-center bg-[var(--panel-solid)]">
           <MonitorOff size={32} className="text-[var(--ink-3)] mb-2.5 opacity-60" />
-          <h3 className="font-mono text-sm font-semibold text-[var(--ink)] mb-1">
+          <h3 className="font-sans text-sm font-semibold text-[var(--ink)] mb-1">
             {t.noRoomsMatch}
           </h3>
           <p className="text-xs text-[var(--ink-3)] mb-3.5">
@@ -35,7 +35,7 @@ export const RoomList: React.FC<RoomListProps> = ({
           {onResetFilters && (
             <button
               onClick={onResetFilters}
-              className="panel px-3.5 py-1.5 text-xs font-mono text-[var(--ink)] hover:bg-[var(--panel-hover)] border-[var(--rule)] cursor-pointer"
+              className="panel px-3.5 py-1.5 text-xs font-sans text-[var(--ink)] hover:bg-[var(--panel-hover)] border-[var(--rule)] cursor-pointer font-medium"
             >
               {t.resetFilters}
             </button>
@@ -63,7 +63,7 @@ export const RoomList: React.FC<RoomListProps> = ({
       {freeRooms.length > 0 && busyRooms.length > 0 && (
         <div className="py-2.5 flex items-center gap-3">
           <div className="flex-1 h-[1px] bg-[var(--rule-faint)]" />
-          <span className="font-mono text-[10.5px] uppercase tracking-wider text-[var(--ink-3)] font-medium select-none">
+          <span className="font-sans text-xs uppercase tracking-wide text-[var(--ink-3)] font-semibold select-none">
             {t.occupiedHeader}
           </span>
           <div className="flex-1 h-[1px] bg-[var(--rule-faint)]" />

@@ -89,13 +89,13 @@ const RoomCardComponent: React.FC<RoomCardProps> = ({
       >
         {/* Left: Room Name + OS + Location/Computers (Auto-truncates with ...) */}
         <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1 overflow-hidden">
-          <span className="font-mono text-xs sm:text-[13px] font-semibold tracking-tight text-[var(--ink)] shrink-0">
+          <span className="font-sans text-[13px] sm:text-sm font-semibold tracking-tight text-[var(--ink)] shrink-0">
             {room.name}
           </span>
 
           {/* OS Pill (Subtle background, no harsh outer border) */}
           <span
-            className={`inline-flex items-center gap-1 px-1 sm:px-1.5 py-0.2 rounded text-[9px] sm:text-[9.5px] font-mono font-medium shrink-0 ${
+            className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] sm:text-xs font-sans font-medium shrink-0 ${
               isLinux
                 ? 'bg-accent-win/10 text-accent-win'
                 : 'bg-accent-linux/10 text-accent-linux'
@@ -103,18 +103,18 @@ const RoomCardComponent: React.FC<RoomCardProps> = ({
           >
             {isLinux ? (
               <>
-                <LinuxIcon className="w-2.5 h-2.5" />
+                <LinuxIcon className="w-3 h-3 shrink-0" />
                 <span>Linux</span>
               </>
             ) : (
               <>
-                <WindowsIcon className="w-2.5 h-2.5" />
+                <WindowsIcon className="w-2.5 h-2.5 shrink-0" />
                 <span>Win</span>
               </>
             )}
           </span>
 
-          <span className="text-[10px] sm:text-[10.5px] text-[var(--ink-3)] font-mono truncate min-w-0">
+          <span className="text-xs text-[var(--ink-3)] font-sans truncate min-w-0">
             <span>{room.building}</span>
             <span className="hidden sm:inline"> • {t.floor} {room.floor} • {room.computers} {t.computers}</span>
           </span>
@@ -125,7 +125,7 @@ const RoomCardComponent: React.FC<RoomCardProps> = ({
           {/* Availability Badge */}
           <div
             title={fullExplanation}
-            className={`px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-[10.5px] font-mono font-medium border flex items-center gap-1 shrink-0 ${statusBadgeClasses}`}
+            className={`px-1.5 sm:px-2 py-0.5 rounded text-xs font-sans font-semibold border flex items-center gap-1 shrink-0 ${statusBadgeClasses}`}
           >
             <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${statusDotColor}`} />
             <span className="whitespace-nowrap">{statusText}</span>
@@ -158,11 +158,11 @@ const RoomCardComponent: React.FC<RoomCardProps> = ({
       {isExpanded && (
         <div
           id={`room-schedule-${room.id}`}
-          className="px-3 py-2.5 bg-transparent border-t border-[var(--rule-faint)] space-y-2.5 animate-fadeIn text-xs font-mono"
+          className="px-3 py-2.5 bg-transparent border-t border-[var(--rule-faint)] space-y-2.5 animate-fadeIn text-xs font-sans"
         >
           {/* Top Specs & Mazemap Row (Fits on 1 line on mobile) */}
           <div className="flex items-center justify-between gap-1.5 sm:gap-2 pb-1.5 border-b border-[var(--rule-faint)] flex-nowrap overflow-x-auto">
-            <div className="flex items-center gap-2 sm:gap-4 flex-nowrap text-[10.5px] sm:text-[11px] text-[var(--ink-2)] shrink-0">
+            <div className="flex items-center gap-2 sm:gap-4 flex-nowrap text-[11px] sm:text-xs text-[var(--ink-2)] shrink-0 font-medium">
               <div className="flex items-center gap-1 sm:gap-1.5">
                 <Building size={12} className="text-accent-linux shrink-0" />
                 <span>{room.building}, {t.floor} {room.floor}</span>
@@ -182,7 +182,7 @@ const RoomCardComponent: React.FC<RoomCardProps> = ({
               href={room.mazemapUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="panel px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10.5px] sm:text-[11px] font-mono text-[var(--ink)] hover:text-accent-linux hover:border-accent-linux transition-colors flex items-center gap-1 sm:gap-1.5 shrink-0"
+              className="panel px-2 sm:px-2.5 py-0.5 sm:py-1 text-[11px] sm:text-xs font-sans text-[var(--ink)] hover:text-accent-linux hover:border-accent-linux transition-colors flex items-center gap-1 sm:gap-1.5 shrink-0 font-medium"
               title={`${t.openMazemap} (${t.floor} ${room.floor})`}
             >
               <MapPin size={11} className="text-accent-linux shrink-0" />
@@ -193,7 +193,7 @@ const RoomCardComponent: React.FC<RoomCardProps> = ({
 
           {/* Mini Gantt Timeline Bar */}
           <div>
-            <div className="text-[11px] font-semibold text-[var(--ink)] mb-0.5">
+            <div className="text-xs font-semibold text-[var(--ink)] mb-0.5">
               {t.roomSchedule}
             </div>
             <GanttRibbon segments={ganttSegments} currentHour={currentHour} lang={lang} />
@@ -201,11 +201,11 @@ const RoomCardComponent: React.FC<RoomCardProps> = ({
 
           {/* List of Bookings for the day (Full text wraps cleanly on mobile) */}
           <div className="space-y-1.5">
-            <div className="text-[11px] font-semibold text-[var(--ink)]">
+            <div className="text-xs font-semibold text-[var(--ink)]">
               {t.bookingsTitle(todayBookings.length)}
             </div>
             {todayBookings.length === 0 ? (
-              <div className="text-[11px] text-status-free flex items-center gap-1.5 py-0.5">
+              <div className="text-xs text-status-free flex items-center gap-1.5 py-0.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-status-free" />
                 <span>{t.noBookingsToday}</span>
               </div>
@@ -224,14 +224,14 @@ const RoomCardComponent: React.FC<RoomCardProps> = ({
                   return (
                     <div
                       key={i}
-                      className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-[10.5px] sm:text-[11px] py-1.5 px-2.5 rounded bg-[var(--panel-solid)] border border-[var(--rule-faint)]"
+                      className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-[11px] sm:text-xs py-1.5 px-2.5 rounded bg-[var(--panel-solid)] border border-[var(--rule-faint)] font-sans"
                     >
                       {/* Top / Left: Time Range + Course Code + Activity Type */}
                       <div className="flex items-center gap-1.5 flex-wrap shrink-0">
                         {/* Time Range with optional multi-day date badges */}
                         <div className="flex items-center gap-1 font-semibold text-[var(--ink)]">
                           {showStartDate && (
-                            <span className="text-[10px] text-[var(--ink-3)] font-normal">
+                            <span className="text-[11px] text-[var(--ink-3)] font-normal">
                               ({formatShortDate(bk.start)})
                             </span>
                           )}
@@ -239,7 +239,7 @@ const RoomCardComponent: React.FC<RoomCardProps> = ({
                           <span>–</span>
                           <span>{endStr}</span>
                           {showEndDate && (
-                            <span className="text-[10px] text-status-sim font-normal">
+                            <span className="text-[11px] text-status-sim font-normal">
                               ({formatShortDate(bk.end)})
                             </span>
                           )}
@@ -247,14 +247,14 @@ const RoomCardComponent: React.FC<RoomCardProps> = ({
 
                         {/* Course Code */}
                         {bk.courseCode && (
-                          <span className="text-accent-linux px-1.5 py-0.2 rounded bg-accent-linux/15 font-medium">
+                          <span className="text-accent-linux px-1.5 py-0.5 rounded bg-accent-linux/15 font-medium">
                             {bk.courseCode}
                           </span>
                         )}
 
                         {/* Undervisningstyp (Only if present!) */}
                         {bk.activityType && (
-                          <span className="text-status-sim px-1.5 py-0.2 rounded bg-status-sim/10 font-medium">
+                          <span className="text-status-sim px-1.5 py-0.5 rounded bg-status-sim/10 font-medium">
                             {bk.activityType}
                           </span>
                         )}
@@ -262,7 +262,7 @@ const RoomCardComponent: React.FC<RoomCardProps> = ({
 
                       {/* Event description / name (Wraps gracefully on mobile so full text is always visible) */}
                       {bk.info && (
-                        <div className="text-[var(--ink-2)] text-[10px] sm:text-[11px] leading-snug break-words">
+                        <div className="text-[var(--ink-2)] text-[11px] sm:text-xs leading-snug break-words">
                           {bk.info}
                         </div>
                       )}

@@ -12,7 +12,7 @@ const ibmPlexSans = IBM_Plex_Sans({
 
 const ibmPlexMono = IBM_Plex_Mono({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
+  weight: ["300", "400", "500", "600", "700"],
   variable: "--font-mono",
   display: "swap",
 });
@@ -72,7 +72,7 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitializerScript }} />
       </head>
-      <body className="selection:bg-accent-linux selection:text-white font-sans">
+      <body className="antialiased selection:bg-accent-linux selection:text-white font-sans">
         {children}
         <Analytics />
       </body>

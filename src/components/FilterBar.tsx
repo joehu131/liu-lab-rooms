@@ -96,7 +96,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder={t.searchPlaceholder}
-              className="panel w-full pl-8 pr-8 py-1.5 text-xs font-mono text-[var(--ink)] placeholder-[var(--ink-3)] focus:outline-none focus:border-accent-linux transition-colors min-h-[36px]"
+              className="panel w-full pl-8 pr-8 py-1.5 text-xs font-sans text-[var(--ink)] placeholder-[var(--ink-3)] focus:outline-none focus:border-accent-linux transition-colors min-h-[36px]"
             />
             {searchQuery && (
               <button
@@ -112,7 +112,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
               setIsMobileSearchOpen(false);
               onSearchChange('');
             }}
-            className="panel px-3 py-1.5 text-xs font-mono text-[var(--ink-2)] hover:text-[var(--ink)] min-h-[36px] cursor-pointer"
+            className="panel px-3 py-1.5 text-xs font-sans text-[var(--ink-2)] hover:text-[var(--ink)] min-h-[36px] cursor-pointer"
           >
             {t.done}
           </button>
@@ -125,10 +125,10 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         <div className="w-full sm:w-auto flex items-center gap-1 p-0.5 rounded-lg bg-[var(--panel)] border border-[var(--rule)] shrink-0">
           <button
             onClick={() => onSelectOs('all')}
-            className={`flex-1 sm:flex-initial px-2 sm:px-2.5 py-1 rounded-md text-xs font-mono transition-all min-h-[32px] touch-manipulation cursor-pointer flex items-center justify-center gap-1 text-center ${
+            className={`flex-1 sm:flex-initial px-2 sm:px-2.5 py-1 rounded-md text-xs font-sans transition-all min-h-[32px] touch-manipulation cursor-pointer flex items-center justify-center gap-1 text-center ${
               selectedOs === 'all'
                 ? 'bg-slate-200 text-slate-900 dark:bg-[var(--ink)] dark:text-[var(--bg-bot)] font-semibold shadow-sm'
-                : 'text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--panel-hover)]'
+                : 'text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--panel-hover)] font-medium'
             }`}
           >
             <span>{lang === 'en' ? 'All' : 'Alla'}</span>
@@ -148,10 +148,10 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           </button>
           <button
             onClick={() => onSelectOs('linux')}
-            className={`flex-1 sm:flex-initial px-2 sm:px-2.5 py-1 rounded-md text-xs font-mono transition-all min-h-[32px] touch-manipulation flex items-center justify-center gap-1 cursor-pointer text-center ${
+            className={`flex-1 sm:flex-initial px-2 sm:px-2.5 py-1 rounded-md text-xs font-sans transition-all min-h-[32px] touch-manipulation flex items-center justify-center gap-1 cursor-pointer text-center ${
               selectedOs === 'linux'
                 ? 'bg-accent-win text-white font-semibold shadow-sm'
-                : 'text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--panel-hover)]'
+                : 'text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--panel-hover)] font-medium'
             }`}
           >
             <LinuxIcon className="w-3.5 h-3.5 shrink-0" />
@@ -172,10 +172,10 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           </button>
           <button
             onClick={() => onSelectOs('windows')}
-            className={`flex-1 sm:flex-initial px-2 sm:px-2.5 py-1 rounded-md text-xs font-mono transition-all min-h-[32px] touch-manipulation flex items-center justify-center gap-1 cursor-pointer text-center ${
+            className={`flex-1 sm:flex-initial px-2 sm:px-2.5 py-1 rounded-md text-xs font-sans transition-all min-h-[32px] touch-manipulation flex items-center justify-center gap-1 cursor-pointer text-center ${
               selectedOs === 'windows'
                 ? 'bg-accent-linux text-white font-semibold shadow-sm'
-                : 'text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--panel-hover)]'
+                : 'text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--panel-hover)] font-medium'
             }`}
           >
             <WindowsIcon className="w-3 h-3 shrink-0" />
@@ -201,10 +201,10 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           {/* Framtida tid/dag Button (Expands on mobile for clean symmetry) */}
           <button
             onClick={onOpenTimeMachine}
-            className={`flex-1 sm:flex-initial panel px-2.5 py-1 rounded-lg text-xs font-mono flex items-center justify-center gap-1.5 transition-all min-h-[32px] shrink-0 touch-manipulation cursor-pointer ${
+            className={`flex-1 sm:flex-initial panel px-2.5 py-1 rounded-lg text-xs font-sans flex items-center justify-center gap-1.5 transition-all min-h-[32px] shrink-0 touch-manipulation cursor-pointer ${
               isSimulating
                 ? 'bg-status-sim/15 border-status-sim text-status-sim font-semibold shadow-sm'
-                : 'text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--panel-hover)] border-[var(--rule)]'
+                : 'text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--panel-hover)] border-[var(--rule)] font-medium'
             }`}
           >
             <Calendar size={13} className={isSimulating ? 'text-status-sim' : 'text-accent-linux'} />
@@ -214,10 +214,10 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           {/* Endast Lediga Toggle (Desktop ONLY - on mobile it lives inside the Filter dropdown) */}
           <button
             onClick={onToggleShowOnlyAvailable}
-            className={`hidden sm:flex panel px-2.5 py-1 rounded-lg text-xs font-mono items-center gap-1.5 transition-all min-h-[32px] shrink-0 touch-manipulation cursor-pointer ${
+            className={`hidden sm:flex panel px-2.5 py-1 rounded-lg text-xs font-sans items-center gap-1.5 transition-all min-h-[32px] shrink-0 touch-manipulation cursor-pointer ${
               showOnlyAvailable
                 ? 'bg-status-free/15 border-status-free text-status-free font-medium'
-                : 'text-[var(--ink-2)] hover:text-[var(--ink)]'
+                : 'text-[var(--ink-2)] hover:text-[var(--ink)] font-medium'
             }`}
           >
             <div
@@ -236,10 +236,10 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           <div className="relative flex-1 sm:flex-initial" ref={dropdownRef}>
             <button
               onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
-              className={`w-full sm:w-auto panel px-2.5 py-1 rounded-lg text-xs font-mono text-[var(--ink)] flex items-center justify-center sm:justify-start gap-1.5 hover:bg-[var(--panel-hover)] transition-all min-h-[32px] cursor-pointer ${
+              className={`w-full sm:w-auto panel px-2.5 py-1 rounded-lg text-xs font-sans text-[var(--ink)] flex items-center justify-center sm:justify-start gap-1.5 hover:bg-[var(--panel-hover)] transition-all min-h-[32px] cursor-pointer ${
                 activeFiltersCount > 0
                   ? 'border-accent-linux text-accent-linux font-medium'
-                  : ''
+                  : 'font-medium'
               }`}
             >
               <SlidersHorizontal size={12} className="sm:hidden text-accent-linux shrink-0" />
@@ -262,7 +262,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
 
             {/* Anchored Dropdown Menu (Guaranteed within viewport on mobile) */}
             {isFilterDropdownOpen && (
-              <div className="absolute right-0 top-full mt-1.5 w-56 max-w-[calc(100vw-32px)] rounded-xl bg-[var(--panel-solid)] border border-[var(--rule)] shadow-2xl py-1.5 z-40 font-mono text-xs animate-fadeIn">
+              <div className="absolute right-0 top-full mt-1.5 w-56 max-w-[calc(100vw-32px)] rounded-xl bg-[var(--panel-solid)] border border-[var(--rule)] shadow-2xl py-1.5 z-40 font-sans text-xs animate-fadeIn">
                 {/* Mobile-only: Endast lediga checkbox at the top */}
                 <div className="sm:hidden">
                   <button
@@ -339,7 +339,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder={t.searchPlaceholder}
-              className="panel w-full pl-7 pr-6 py-1 text-xs font-mono text-[var(--ink)] placeholder-[var(--ink-3)] focus:outline-none focus:border-accent-linux transition-colors min-h-[32px]"
+              className="panel w-full pl-7 pr-6 py-1 text-xs font-sans text-[var(--ink)] placeholder-[var(--ink-3)] focus:outline-none focus:border-accent-linux transition-colors min-h-[32px]"
             />
             {searchQuery && (
               <button

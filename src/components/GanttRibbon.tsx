@@ -26,7 +26,7 @@ export const GanttRibbon: React.FC<GanttRibbonProps> = ({ segments, currentHour,
   return (
     <div className="w-full mt-2 select-none">
       {/* LiU Hourly Event Ticks (Exact Geometric Coordinates) */}
-      <div className="relative w-full h-3.5 text-[9px] sm:text-[10px] font-mono text-[var(--ink-3)] mb-1">
+      <div className="relative w-full h-3.5 text-[10px] sm:text-[11px] font-sans font-medium text-[var(--ink-3)] mb-1">
         {LIU_PASSES.map((pass) => {
           const leftPercent = ((pass.hour - 7) / 14) * 100;
           return (

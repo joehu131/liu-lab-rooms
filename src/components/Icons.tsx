@@ -7,9 +7,13 @@ export const WindowsIcon = ({ className = 'w-3 h-3 shrink-0' }: { className?: st
   </svg>
 );
 
-// Authentic Linux Tux silhouette icon
+// Apple-style Linux penguin icon
 export const LinuxIcon = ({ className = 'w-3 h-3 shrink-0' }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-    <path d="M12.002 0c-2.457 0-4.086 1.83-4.086 4.603 0 1.25.32 2.392.83 3.32-.457.733-.744 1.637-.744 2.656 0 .393.045.772.127 1.134-.79.43-1.488 1.054-2.02 1.815-.992 1.417-1.487 3.256-1.487 5.512 0 .546.033 1.066.096 1.554.06.467.247.886.536 1.206.31.344.737.545 1.228.572.235.013.48-.008.727-.06 1.34-.282 2.822-1.04 4.103-2.152.222.02.447.03.67.03.224 0 .448-.01.67-.03 1.282 1.112 2.763 1.87 4.103 2.152.247.052.492.073.727.06.49-.027.918-.228 1.228-.572.29-.32.476-.74.536-1.206.063-.488.096-1.008.096-1.554 0-2.256-.495-4.095-1.487-5.512-.532-.76-1.23-1.385-2.02-1.815.082-.362.127-.74.127-1.134 0-1.02-.287-1.923-.744-2.656.51-.928.83-2.07.83-3.32C16.088 1.83 14.46 0 12.002 0z" />
-  </svg>
+  // eslint-disable-next-line @next/next/no-img-element
+  <img
+    src="/icons/linux-penguin.png"
+    alt=""
+    aria-hidden="true"
+    className={`${className} object-contain`}
+  />
 );

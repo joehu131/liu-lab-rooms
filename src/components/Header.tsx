@@ -33,10 +33,10 @@ export const Header: React.FC<HeaderProps> = ({
       <header className="w-full max-w-5xl mx-auto px-4 pt-4 sm:pt-6 pb-2 flex items-center justify-between">
         {/* Left: Network Badge */}
         <div className="panel inline-flex items-center gap-2 px-3 py-1.5 bg-[var(--panel)] border-[var(--rule)]">
-          <span className="font-mono text-xs font-semibold tracking-wider text-[var(--ink)]">
+          <span className="font-sans text-xs sm:text-sm font-semibold text-[var(--ink)]">
             {t.appTitle}
           </span>
-          <span className="text-xs text-[var(--ink-3)] border-l border-[var(--rule)] pl-2 font-mono hidden sm:inline">
+          <span className="text-xs text-[var(--ink-3)] border-l border-[var(--rule)] pl-2 font-sans hidden sm:inline">
             {t.campusValla}
           </span>
         </div>
@@ -61,7 +61,7 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={onToggleLang}
             title={t.langToggle}
             aria-label={t.langToggle}
-            className="panel px-2.5 py-1.5 text-[11px] font-mono font-semibold text-[var(--ink)] hover:bg-[var(--panel-hover)] flex items-center justify-center transition-colors min-h-[36px] min-w-[38px] cursor-pointer"
+            className="panel px-2.5 py-1.5 text-xs font-sans font-semibold text-[var(--ink)] hover:bg-[var(--panel-hover)] flex items-center justify-center transition-colors min-h-[36px] min-w-[38px] cursor-pointer"
           >
             {lang === 'sv' ? 'ENG' : 'SWE'}
           </button>

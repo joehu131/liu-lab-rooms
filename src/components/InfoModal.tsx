@@ -40,7 +40,7 @@ export const InfoModal: React.FC<InfoModalProps> = ({ isOpen, onClose, lang = 's
         <div className="flex items-center justify-between pb-4 mb-4 border-b border-[var(--rule)]">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-accent-linux animate-pulse" />
-            <h2 id="info-modal-title" className="font-mono text-sm font-semibold tracking-wider uppercase text-[var(--ink)]">
+            <h2 id="info-modal-title" className="font-sans text-sm font-semibold tracking-wide uppercase text-[var(--ink)]">
               {isEn ? 'LiU Lab Rooms • Campus Valla' : 'LiU Labbsalar • Campus Valla'}
             </h2>
           </div>
@@ -105,7 +105,7 @@ export const InfoModal: React.FC<InfoModalProps> = ({ isOpen, onClose, lang = 's
             </p>
           </div>
 
-          <div className="pt-3 border-t border-[var(--rule)] flex flex-wrap items-center justify-between gap-2 text-[11px] text-[var(--ink-3)] font-mono">
+          <div className="pt-3 border-t border-[var(--rule)] flex flex-wrap items-center justify-between gap-2 text-[11px] text-[var(--ink-3)] font-sans">
             <span>{isEn ? 'Data from TimeEdit LiU' : 'Data från TimeEdit LiU'}</span>
             <a
               href="https://cloud.timeedit.net/liu/web/schema/"
