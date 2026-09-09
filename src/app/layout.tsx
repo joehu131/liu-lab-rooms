@@ -72,7 +72,7 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitializerScript }} />
       </head>
-      <body className="antialiased selection:bg-accent-linux selection:text-white font-sans">
+      <body className="selection:bg-accent-linux selection:text-white font-sans">
         {children}
         <Analytics />
       </body>

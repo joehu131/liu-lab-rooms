@@ -4,7 +4,7 @@ import React, { memo, useState } from 'react';
 import { RoomAvailability } from '@/types';
 import { formatMinutes, formatStockholmTime, formatStockholmDate } from '@/lib/formatters';
 import { GanttRibbon } from './GanttRibbon';
-import { WindowsIcon } from './FilterBar';
+import { WindowsIcon, LinuxIcon } from './Icons';
 import { MapPin, ChevronDown, Monitor, Users, Building } from 'lucide-react';
 import { Language, translations } from '@/lib/i18n';
 
@@ -103,7 +103,7 @@ const RoomCardComponent: React.FC<RoomCardProps> = ({
           >
             {isLinux ? (
               <>
-                <span>🐧</span>
+                <LinuxIcon className="w-2.5 h-2.5" />
                 <span>Linux</span>
               </>
             ) : (

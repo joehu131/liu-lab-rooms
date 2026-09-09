@@ -58,11 +58,10 @@ body {
   background-image: radial-gradient(circle at 50% 0%, var(--bg-top) 0%, var(--bg-bot) 75%);
   color: var(--ink);
   font-family: var(--font-ibm-plex-sans);
-  font-weight: 300;
+  font-weight: 400;
   min-height: 100vh;
   min-height: 100dvh;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
   padding-bottom: env(safe-area-inset-bottom, 16px);
 }
 
