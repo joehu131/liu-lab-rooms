@@ -169,8 +169,8 @@ export async function fetchTimeEditSchedule(daysAhead: number = 14): Promise<Sch
       'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko)',
     },
     signal: AbortSignal.timeout(8000),
-    // revalidate every 15 minutes
-    next: { revalidate: 900 },
+    // Always fetch fresh upstream data; response caching is managed via CDN Cache-Control in route.ts
+    cache: 'no-store',
   });
 
   if (!res.ok) {

@@ -5,6 +5,7 @@ import { RoomAvailability } from '@/types';
 import { RoomCard } from './RoomCard';
 import { MonitorOff } from 'lucide-react';
 import { Language, translations } from '@/lib/i18n';
+import { BUILDING_ORDER } from '@/data/rooms';
 
 interface RoomListProps {
   availabilities: RoomAvailability[];
@@ -48,29 +49,54 @@ export const RoomList: React.FC<RoomListProps> = ({
   const freeRooms = availabilities.filter((a) => a.status !== 'BUSY');
   const busyRooms = availabilities.filter((a) => a.status === 'BUSY');
 
+  // Group available rooms by building in BUILDING_ORDER
+  const freeGroups: Array<{ building: string; rooms: RoomAvailability[] }> = BUILDING_ORDER.map((building) => ({
+    building,
+    rooms: freeRooms.filter((a) => a.room.building === building),
+  })).filter((group) => group.rooms.length > 0);
+
+  // Catch any room with an unlisted building to ensure no rooms are ever dropped
+  const knownBuildings = new Set<string>(BUILDING_ORDER);
+  const otherRooms = freeRooms.filter((a) => !knownBuildings.has(a.room.building));
+  if (otherRooms.length > 0) {
+    freeGroups.push({
+      building: lang === 'en' ? 'Other' : 'Övrigt',
+      rooms: otherRooms,
+    });
+  }
+
   return (
-    <main className="w-full max-w-5xl mx-auto px-4 pb-16 space-y-1">
-      {/* Available / Free Rooms */}
-      {freeRooms.length > 0 && (
-        <div className="room-divider-list">
-          {freeRooms.map((avail) => (
-            <RoomCard key={avail.room.id} availability={avail} currentHour={currentHour} lang={lang} />
-          ))}
+    <main className="w-full max-w-5xl mx-auto px-4 pb-16 space-y-2">
+      {/* Available / Free Rooms (Partitioned by building with divider headers) */}
+      {freeGroups.map((group) => (
+        <div key={group.building} className="space-y-1">
+          <div className="py-2.5 flex items-center gap-3">
+            <div className="flex-1 h-[1px] bg-[var(--rule-faint)]" aria-hidden="true" />
+            <h2 className="font-sans text-[11px] uppercase tracking-wider text-[var(--ink-3)] font-medium select-none m-0">
+              {group.building}
+            </h2>
+            <div className="flex-1 h-[1px] bg-[var(--rule-faint)]" aria-hidden="true" />
+          </div>
+          <div className="room-divider-list">
+            {group.rooms.map((avail) => (
+              <RoomCard key={avail.room.id} availability={avail} currentHour={currentHour} lang={lang} />
+            ))}
+          </div>
         </div>
-      )}
+      ))}
 
       {/* Center Divider Header: Upptagna salar: / Occupied labs: */}
       {freeRooms.length > 0 && busyRooms.length > 0 && (
         <div className="py-2.5 flex items-center gap-3">
-          <div className="flex-1 h-[1px] bg-[var(--rule-faint)]" />
-          <span className="font-sans text-xs uppercase tracking-wide text-[var(--ink-3)] font-semibold select-none">
+          <div className="flex-1 h-[1px] bg-[var(--rule-faint)]" aria-hidden="true" />
+          <h2 className="font-sans text-[11px] uppercase tracking-wider text-[var(--ink-3)] font-medium select-none m-0">
             {t.occupiedHeader}
-          </span>
-          <div className="flex-1 h-[1px] bg-[var(--rule-faint)]" />
+          </h2>
+          <div className="flex-1 h-[1px] bg-[var(--rule-faint)]" aria-hidden="true" />
         </div>
       )}
 
-      {/* Occupied / Busy Rooms */}
+      {/* Occupied / Busy Rooms (Grouped by building sequence without extra divider lines) */}
       {busyRooms.length > 0 && (
         <div className="room-divider-list">
           {busyRooms.map((avail) => (

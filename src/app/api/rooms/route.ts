@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { fetchTimeEditSchedule } from '@/lib/timeedit';
 
-export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
@@ -11,7 +10,7 @@ export async function GET() {
     return NextResponse.json(schedule, {
       status: 200,
       headers: {
-        'Cache-Control': 'public, s-maxage=900, stale-while-revalidate=86400',
+        'Cache-Control': 'public, max-age=0, s-maxage=900, stale-while-revalidate=86400',
         'CDN-Cache-Control': 'public, s-maxage=900, stale-while-revalidate=86400',
         'Vercel-CDN-Cache-Control': 'public, s-maxage=900, stale-while-revalidate=86400',
       },

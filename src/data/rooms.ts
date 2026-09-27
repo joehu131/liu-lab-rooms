@@ -1,5 +1,14 @@
 import { RoomMetadata } from '@/types';
 
+export const BUILDING_ORDER = [
+  'A-huset',
+  'B-huset',
+  'Key',
+  'E-huset',
+  'Fysikhuset',
+  'Studenthuset',
+] as const;
+
 export const LAB_ROOMS: RoomMetadata[] = [
   // ================= LINUX ROOMS (22) =================
   {
@@ -490,14 +499,6 @@ export const LAB_ROOMS: RoomMetadata[] = [
   },
 ];
 
-export const ALL_BUILDINGS = [
-  'All',
-  'B-huset',
-  'A-huset',
-  'E-huset',
-  'Key',
-  'Fysikhuset',
-  'Studenthuset',
-] as const;
+export const ALL_BUILDINGS = ['All', ...BUILDING_ORDER] as const;
 
 export const ALL_TIMEEDIT_IDS = LAB_ROOMS.map((r) => r.timeeditId);

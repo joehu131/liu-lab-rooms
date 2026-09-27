@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { LAB_ROOMS } from '../data/rooms';
+import { LAB_ROOMS, BUILDING_ORDER } from '../data/rooms';
 import { parseStockholmDateTime } from '../lib/timeedit';
 import { calculateAllRoomsAvailability, calculateRoomAvailability } from '../lib/availability';
 import { ScheduleResponse } from '../types';
@@ -77,5 +77,24 @@ test('Integration & Time Machine Simulation Tests', async (t) => {
     assert.equal(linuxRooms.length, 22);
     assert.equal(winRooms.length, 20);
     assert.equal(bHusetRooms.length, 23); // 22 Linux + 1 Windows (Franklin) in B-huset
+  });
+
+  await t.test('All rooms in LAB_ROOMS belong to valid BUILDING_ORDER', () => {
+    assert.equal(BUILDING_ORDER.length, 6);
+    assert.deepEqual(Array.from(BUILDING_ORDER), [
+      'A-huset',
+      'B-huset',
+      'Key',
+      'E-huset',
+      'Fysikhuset',
+      'Studenthuset',
+    ]);
+
+    for (const r of LAB_ROOMS) {
+      assert.ok(
+        BUILDING_ORDER.includes(r.building),
+        `Room ${r.name} has invalid building: ${r.building}`
+      );
+    }
   });
 });

@@ -12,6 +12,7 @@ import { TimeMachineModal } from '@/components/TimeMachineModal';
 import { translations } from '@/lib/i18n';
 import { usePreferences } from '@/lib/usePreferences';
 import { AlertCircle } from 'lucide-react';
+import { BUILDING_ORDER } from '@/data/rooms';
 
 const fetcher = (url: string) =>
   fetch(url).then((res) => {
@@ -115,50 +116,69 @@ export default function HomePage() {
       );
     }
 
-    // Multi-tier Sorting:
-    // 1. >= 10 computers, Free all day (A-Z)
-    // 2. >= 10 computers, Free finite time (longest free time first, then A-Z)
-    // 3. < 10 computers, Free all day (A-Z)
-    // 4. < 10 computers, Free finite time (longest free time first, then A-Z)
-    // 5. >= 10 computers, Busy (soonest opening first, then A-Z)
-    // 6. < 10 computers, Busy (soonest opening first, then A-Z)
-    result.sort((a, b) => {
-      const getTier = (item: RoomAvailability) => {
-        const isAvail = item.status !== 'BUSY';
-        const hasMany = item.room.computers >= 10;
-        const isAllDay = isAvail && (item.freeMinutesRemaining === undefined || item.freeUntil === undefined);
+    // Building-Grouped Multi-tier Sorting:
+    // 1. Primary: Available (FREE / ENDING_SOON) comes before Occupied (BUSY)
+    // 2. Secondary: Building sequence (A-huset -> B-huset -> Key -> E-huset -> Fysikhuset -> Studenthuset)
+    // 3. Tertiary within each building:
+    //    - Available:
+    //      Tier 1: >= 10 computers, Free all day (A-Z)
+    //      Tier 2: >= 10 computers, Free finite time (longest free time first, then A-Z)
+    //      Tier 3: < 10 computers, Free all day (A-Z)
+    //      Tier 4: < 10 computers, Free finite time (longest free time first, then A-Z)
+    //    - Occupied:
+    //      Soonest opening first (busyUntil ascending), then A-Z
+    const getBuildingRank = (b: string) => {
+      const idx = (BUILDING_ORDER as readonly string[]).indexOf(b);
+      return idx === -1 ? 999 : idx;
+    };
 
-        if (isAvail) {
+    result.sort((a, b) => {
+      const isAvailA = a.status !== 'BUSY';
+      const isAvailB = b.status !== 'BUSY';
+
+      // 1. Primary: Available before Occupied
+      if (isAvailA !== isAvailB) {
+        return isAvailA ? -1 : 1;
+      }
+
+      // 2. Secondary: Building Order
+      const rankA = getBuildingRank(a.room.building);
+      const rankB = getBuildingRank(b.room.building);
+      if (rankA !== rankB) {
+        return rankA - rankB;
+      }
+
+      // 3. Tertiary: Within each building
+      if (isAvailA) {
+        const getTier = (item: RoomAvailability) => {
+          const hasMany = item.room.computers >= 10;
+          const isAllDay = item.freeMinutesRemaining === undefined || item.freeUntil === undefined;
           if (hasMany) return isAllDay ? 1 : 2;
           return isAllDay ? 3 : 4;
-        } else {
-          return hasMany ? 5 : 6;
+        };
+
+        const tierA = getTier(a);
+        const tierB = getTier(b);
+
+        if (tierA !== tierB) {
+          return tierA - tierB;
         }
-      };
 
-      const tierA = getTier(a);
-      const tierB = getTier(b);
+        // Tier 1 & 3: Free all day -> sort A-Z
+        if (tierA === 1 || tierA === 3) {
+          return a.room.name.localeCompare(b.room.name, 'sv');
+        }
 
-      if (tierA !== tierB) {
-        return tierA - tierB;
-      }
-
-      // Tier 1 & 3: Free all day -> sort A-Z
-      if (tierA === 1 || tierA === 3) {
-        return a.room.name.localeCompare(b.room.name, 'sv');
-      }
-
-      // Tier 2 & 4: Free finite time -> sort longest remaining time first, then A-Z
-      if (tierA === 2 || tierA === 4) {
+        // Tier 2 & 4: Free finite time -> sort longest remaining time first, then A-Z
         const diff = (b.freeMinutesRemaining || 0) - (a.freeMinutesRemaining || 0);
         if (diff !== 0) return diff;
         return a.room.name.localeCompare(b.room.name, 'sv');
+      } else {
+        // Busy -> sort earliest opening first, then A-Z
+        const diff = (a.busyUntil || 0) - (b.busyUntil || 0);
+        if (diff !== 0) return diff;
+        return a.room.name.localeCompare(b.room.name, 'sv');
       }
-
-      // Tier 5 & 6: Busy -> sort earliest opening first, then A-Z
-      const diff = (a.busyUntil || 0) - (b.busyUntil || 0);
-      if (diff !== 0) return diff;
-      return a.room.name.localeCompare(b.room.name, 'sv');
     });
 
     return result;
